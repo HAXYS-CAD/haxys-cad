@@ -1,0 +1,26 @@
+name: Problema · Bug
+description: Algo não funcionou como esperado · Something didn't work
+labels: ["problema"]
+body:
+  - type: textarea
+    id: oque
+    attributes:
+      label: O que aconteceu? · What happened?
+      description: O que você fez, o que esperava e o que apareceu. · What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passo a passo para repetir · Steps to reproduce
+      placeholder: "1. Abri...\n2. Cliquei em...\n3. Apareceu..."
+  - type: input
+    id: versao
+    attributes:
+      label: Versão do HAXYS CAD e do Windows · HAXYS CAD and Windows version
+      placeholder: "0.1.0 · Windows 11"
+  - type: textarea
+    id: imagem
+    attributes:
+      label: Imagem da tela (opcional) · Screenshot (optional)
+      description: Arraste a imagem para cá. Não mostre chaves de IA nem dados pessoais. · Drag it here. Don't show AI keys or personal data.

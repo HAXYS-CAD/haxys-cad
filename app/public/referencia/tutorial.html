@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAXYS CAD — Fotos com referência de medidas</title>
+<style>
+  :root { --tinta: #1d2430; --fraco: #5b6474; --linha: #d9dee7; --destaque: #e8590c; --fundo: #f6f7f9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.55 "Segoe UI", Arial, sans-serif; color: var(--tinta); background: var(--fundo); }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 26px; margin: 8px 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  p.sub { color: var(--fraco); margin: 0 0 16px; }
+  .cartao { background: #fff; border: 1px solid var(--linha); border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+  .passo { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: center; }
+  @media (max-width: 640px) { .passo { grid-template-columns: 1fr; } }
+  .num { display: inline-block; width: 26px; height: 26px; border-radius: 50%; background: var(--destaque); color: #fff; text-align: center; font-weight: 700; line-height: 26px; margin-right: 6px; }
+  a.botao { display: inline-block; background: var(--tinta); color: #fff; text-decoration: none; padding: 9px 14px; border-radius: 8px; margin: 4px 8px 4px 0; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  .certo { color: #2b8a3e; font-weight: 700; } .errado { color: #c92a2a; font-weight: 700; }
+  svg { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Fotos com referência de medidas</h1>
+  <p class="sub">Para o HAXYS CAD (e a IA) acertarem as medidas de uma peça a partir de uma foto.</p>
+
+  <div class="cartao">
+    <b>O que é a referência:</b> um <b>marcador HAXYS de 40 mm</b> (quadrado preto com um quadrado branco de 20 mm no meio) e uma <b>régua de 150 mm</b>.
+    O HAXYS CAD acha o marcador sozinho na foto e calcula quantos milímetros vale cada ponto da imagem.
+    <div style="margin-top:10px">
+      <a class="botao" href="folha-referencia.svg" target="_blank">Abrir a folha para imprimir</a>
+    </div>
+    <ul>
+      <li><b>Papel:</b> imprima a folha em <b>tamanho real (100%)</b>, sem "ajustar à página". Meça a linha de 100 mm com uma régua: tem que dar 100 mm.</li>
+      <li><b>Impressora 3D (AMS):</b> no painel HAXYS, botão <b>Referência de medidas</b> → <b>Imprimir o bloco</b>: um bloco 40 × 40 mm em preto com o centro branco (duas cores). É mais firme e não amassa.</li>
+    </ul>
+  </div>
+
+  <h2>Como tirar a foto</h2>
+
+  <div class="cartao passo">
+    <svg viewBox="0 0 180 120"><rect x="10" y="20" width="160" height="90" fill="#eef1f5" stroke="#9aa3b2"/><rect x="40" y="45" width="70" height="40" rx="8" fill="#555"/><rect x="125" y="55" width="25" height="25" fill="#000"/><rect x="131" y="61" width="13" height="13" fill="#fff"/><text x="90" y="14" font-size="9" text-anchor="middle" fill="#5b6474">peça + marcador lado a lado</text></svg>
+    <div><span class="num">1</span><b>Marcador ao lado da peça, no mesmo plano.</b> Ponha o marcador encostado ou perto da peça, na mesma altura da face que você quer medir (se a peça é alta, apoie o marcador sobre algo da mesma altura).</div>
+  </div>
+
+  <div class="cartao passo">
+    <svg viewBox="0 0 180 120"><rect x="20" y="95" width="140" height="8" fill="#9aa3b2"/><rect x="70" y="10" width="40" height="18" rx="3" fill="#1d2430"/><line x1="90" y1="28" x2="90" y2="92" stroke="#e8590c" stroke-dasharray="4 3"/><text x="120" y="22" font-size="9" fill="#5b6474">celular</text><text x="120" y="60" font-size="9" fill="#e8590c">reto, de cima</text></svg>
+    <div><span class="num">2</span><b>Celular reto, de cima</b>, paralelo à mesa (sem inclinar). Fique a uns 30 a 50 cm e use o zoom em vez de chegar muito perto (perto demais distorce as bordas).</div>
+  </div>
+
+  <div class="cartao passo">
+    <svg viewBox="0 0 180 120"><rect x="10" y="10" width="160" height="100" fill="#fff" stroke="#9aa3b2"/><circle cx="150" cy="25" r="10" fill="#ffd43b"/><rect x="45" y="45" width="60" height="35" rx="6" fill="#555"/><text x="90" y="100" font-size="9" text-anchor="middle" fill="#5b6474">fundo liso e claro, luz difusa</text></svg>
+    <div><span class="num">3</span><b>Fundo liso e claro, luz sem sombra forte.</b> Papel branco ou cartolina embaixo. Peça escura em fundo claro funciona melhor (peça clara: use fundo escuro e escolha "a peça é clara").</div>
+  </div>
+
+  <div class="cartao passo">
+    <svg viewBox="0 0 180 120"><rect x="10" y="20" width="75" height="80" fill="#eef1f5" stroke="#9aa3b2"/><rect x="25" y="45" width="45" height="30" rx="5" fill="#555"/><rect x="95" y="20" width="75" height="80" fill="#eef1f5" stroke="#9aa3b2"/><rect x="110" y="40" width="45" height="45" rx="3" fill="#555"/><text x="47" y="14" font-size="9" text-anchor="middle">de cima</text><text x="132" y="14" font-size="9" text-anchor="middle">de lado</text></svg>
+    <div><span class="num">4</span><b>Uma foto por vista.</b> De cima (contorno), de frente e de lado (alturas). Em cada foto, o marcador deve estar no plano daquela vista (de lado: marcador em pé, encostado na peça).</div>
+  </div>
+
+  <h2>Confira antes de mandar</h2>
+  <div class="cartao">
+    <ul>
+      <li><span class="certo">✔</span> Peça inteira e o marcador inteiro aparecem na foto.</li>
+      <li><span class="certo">✔</span> Marcador sem dobra, sem reflexo e sem nada por cima.</li>
+      <li><span class="errado">✘</span> Foto inclinada (os lados do marcador ficam tortos).</li>
+      <li><span class="errado">✘</span> Sombra encostada na peça (vira parte do contorno).</li>
+    </ul>
+  </div>
+
+  <h2>Depois</h2>
+  <div class="cartao">
+    <ul>
+      <li><b>Peça a partir de imagem</b> (painel HAXYS) → em <b>Escala</b> escolha <b>"Pelo marcador HAXYS (40 mm)"</b>. O marcador é achado e tirado da peça; a medida vem dele.</li>
+      <li><b>Falar com a IA</b> (modo Codex) → <b>🖼 Imagem</b>: anexe as fotos e conte o que é a peça, para que serve e as medidas que você sabe. A IA usa o marcador (40 mm) e a régua para as medidas.</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

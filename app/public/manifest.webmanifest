@@ -1,0 +1,10 @@
+{
+  "name": "HAXYS CAD",
+  "short_name": "HAXYS CAD",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1c2128",
+  "theme_color": "#1c2128",
+  "icons": [{ "src": "/icone.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }]
+}

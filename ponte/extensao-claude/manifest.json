@@ -1,0 +1,27 @@
+{
+  "manifest_version": "0.2",
+  "name": "haxys-cad",
+  "display_name": "HAXYS CAD",
+  "version": "1.0.0",
+  "description": "Abre o HAXYS CAD e constrói peças 3D por conversa.",
+  "long_description": "Conector do HAXYS CAD (CAD 3D local parecido com o Autodesk Fusion). A IA abre o programa, constrói peças com ações de CAD (caixa, cilindro, esboço, extrusão, furo, arredondar...), vê a tela e manda imprimir no Bambu Studio. Precisa do HAXYS CAD instalado neste computador.",
+  "author": { "name": "HAXYS" },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.mjs"]
+    }
+  },
+  "tools": [
+    { "name": "abrir_haxys", "description": "Abre o HAXYS CAD neste computador." },
+    { "name": "construir", "description": "Constrói a peça com uma lista de ações de CAD." },
+    { "name": "estado_do_projeto", "description": "Diz o que já existe no projeto." },
+    { "name": "ver_tela", "description": "Foto da janela 3D do HAXYS." }
+  ],
+  "compatibility": {
+    "platforms": ["win32"],
+    "runtimes": { "node": ">=18.0.0" }
+  }
+}

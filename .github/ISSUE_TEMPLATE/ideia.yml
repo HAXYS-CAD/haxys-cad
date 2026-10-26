@@ -1,0 +1,15 @@
+name: Ideia · Feature request
+description: Sugira uma ferramenta ou melhoria · Suggest a tool or improvement
+labels: ["ideia"]
+body:
+  - type: textarea
+    id: ideia
+    attributes:
+      label: Qual é a ideia? · What's the idea?
+      description: O que você queria fazer no HAXYS CAD e ainda não consegue. · What you'd like to do that you can't yet.
+    validations:
+      required: true
+  - type: textarea
+    id: porque
+    attributes:
+      label: Por que ajudaria? · Why would it help?

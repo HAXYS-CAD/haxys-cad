@@ -1,0 +1,78 @@
+{
+  "name": "haxys-cad",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "faixa": "node ../ferramentas/gerar_faixa.mjs",
+    "servidor": "esbuild vite.config.ts --bundle --platform=node --format=esm --packages=external --outfile=servidor.mjs --log-level=warning",
+    "programa": "npm run build && npm run servidor && electron .",
+    "instalador": "npm run build && npm run servidor && electron-builder --win nsis"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9",
+    "selfsigned": "2.4.1",
+    "vite": "^6.4.5"
+  },
+  "devDependencies": {
+    "@types/three": "^0.170.0",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3",
+    "qrcode-generator": "^1.4.4",
+    "replicad": "^1.1.0",
+    "replicad-opencascadejs": "^1.1.0",
+    "three": "^0.170.0",
+    "typescript": "^5.7.2"
+  },
+  "description": "HAXYS CAD - CAD 3D da HAXYS",
+  "author": "HAXYS",
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.haxys.cad",
+    "productName": "HAXYS CAD",
+    "copyright": "HAXYS",
+    "directories": {
+      "output": "../instalador"
+    },
+    "asar": false,
+    "files": [
+      "dist/**/*",
+      "servidor.mjs",
+      "electron/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../ponte/haxys-ponte.mjs",
+        "to": "ponte/haxys-ponte.mjs"
+      },
+      {
+        "from": "../ferramentas/fusion_trazer.py",
+        "to": "ferramentas/fusion_trazer.py"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png",
+      "executableName": "HAXYS CAD"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "HAXYS CAD",
+      "language": "1046",
+      "installerLanguages": [
+        "pt_BR"
+      ],
+      "artifactName": "HAXYS-CAD-Setup-${version}.${ext}",
+      "runAfterFinish": true,
+      "include": "build/instalador.nsh"
+    }
+  }
+}

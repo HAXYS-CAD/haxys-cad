@@ -1,0 +1,727 @@
+/* Cores próprias do HAXYS CAD. A posição das regiões segue o Fusion. */
+:root {
+  --fundo-app: #23272e;
+  --texto-app: #e6e9ee;
+  --fundo-faixa: #f3f4f6;
+  --borda: #d3d7dd;
+  --texto: #2b313a;
+  --texto-fraco: #6a7380;
+  --destaque: #e8621c; /* laranja HAXYS */
+  --contexto: #1f8a70; /* aba que aparece durante um comando */
+  --flutuante: rgba(255, 255, 255, 0.86);
+  --painel: #fff;          /* menus, janelas de comando */
+  --campo: #fff;           /* caixas de digitar */
+  --hover: #e6e9ed;
+  --suave: #f7f8fa;        /* fundos de áreas internas */
+  --selecao: #dce9fd;
+  --azul: #1d5fbf;
+  --erro-fundo: #fde6e6;
+  --aviso-fundo: #fff4d6;
+  --fundo-3d-a: #fbfcfd;
+  --fundo-3d-b: #dfe5ec;
+  --icone-traco: #2b313a;
+  --icone-neutro: #e3e8ee;
+  --faixa-topo: var(--fundo-faixa); /* degradê da faixa (profundidade) */
+  --sombra: 0 4px 14px rgba(0, 0, 0, 0.12);
+  color-scheme: light;
+}
+/* Temas escuros (caixa "Tema" na barra de cima; escolha guardada no navegador). */
+:root[data-tema="escuro"] {
+  --sombra: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --faixa-topo: #2e333b;
+  --fundo-app: #15181d;
+  --fundo-faixa: #262a31;
+  --borda: #3d444e;
+  --texto: #e3e7ec;
+  --texto-fraco: #9aa3ae;
+  --flutuante: rgba(38, 42, 49, 0.9);
+  --painel: #2e333b;
+  --campo: #1f2329;
+  --hover: #3a414b;
+  --suave: #22262c;
+  --selecao: #1f3d63;
+  --azul: #8db8ff;
+  --erro-fundo: #4a2428;
+  --aviso-fundo: #4a3d1c;
+  --fundo-3d-a: #3b4049;
+  --fundo-3d-b: #1d2026;
+  --icone-traco: #d9dee5;
+  --icone-neutro: #4a515c;
+  color-scheme: dark;
+}
+/* Carbono: preto profundo com laranja. */
+:root[data-tema="carbono"] {
+  --sombra: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --fundo-app: #08090a; --faixa-topo: #1d1f22; --fundo-faixa: #131416;
+  --borda: #2a2c30; --texto: #ececec; --texto-fraco: #8d9096;
+  --destaque: #ff6b1a; --flutuante: rgba(22, 23, 26, 0.82);
+  --painel: #18191c; --campo: #0e0f11; --hover: #26282c; --suave: #101113;
+  --selecao: #3a2210; --azul: #ffa25e; --erro-fundo: #4a2020; --aviso-fundo: #45351a;
+  --fundo-3d-a: #2c2e33; --fundo-3d-b: #060607;
+  --icone-traco: #e2e2e2; --icone-neutro: #34363b;
+  color-scheme: dark;
+}
+/* Grafite: cinza neutro (sem azul) com laranja. */
+:root[data-tema="grafite"] {
+  --sombra: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --fundo-app: #1b1c1e; --faixa-topo: #393b3f; --fundo-faixa: #2b2c2f;
+  --borda: #46484d; --texto: #e8e8e8; --texto-fraco: #a0a2a7;
+  --destaque: #f07a2a; --flutuante: rgba(49, 50, 54, 0.85);
+  --painel: #313236; --campo: #222326; --hover: #3e4045; --suave: #262729;
+  --selecao: #4a3322; --azul: #ffb27a; --erro-fundo: #4a2626; --aviso-fundo: #4a3d1c;
+  --fundo-3d-a: #55585e; --fundo-3d-b: #1e1f22;
+  --icone-traco: #e0e0e0; --icone-neutro: #4b4d52;
+  color-scheme: dark;
+}
+/* Verde exército: oliva fosco, cinza e laranja. */
+:root[data-tema="exercito"] {
+  --sombra: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --fundo-app: #161911; --faixa-topo: #3a4130; --fundo-faixa: #2b3123;
+  --borda: #4a5339; --texto: #e7e9da; --texto-fraco: #a6ab91;
+  --destaque: #e8761c; --contexto: #5b6b2e; --flutuante: rgba(44, 50, 36, 0.86);
+  --painel: #30372a; --campo: #1f2419; --hover: #414a33; --suave: #252a1e;
+  --selecao: #45522c; --azul: #c6dc86; --erro-fundo: #4a2620; --aviso-fundo: #4a421c;
+  --fundo-3d-a: #565d48; --fundo-3d-b: #191c13;
+  --icone-traco: #e4e7d4; --icone-neutro: #4e573f;
+  color-scheme: dark;
+}
+/* Marinho: azul escuro com detalhes dourados, sobre cinzas. */
+:root[data-tema="marinho"] {
+  --sombra: 0 8px 26px rgba(0, 0, 0, 0.55);
+  --fundo-app: #0b1424; --texto-app: #e8e2cf; --faixa-topo: #2f343c; --fundo-faixa: #24282e;
+  --borda: #3f454f; --texto: #e6e8ec; --texto-fraco: #9da3ad;
+  --destaque: #d4af37; --contexto: #1d3a6b; --flutuante: rgba(30, 36, 46, 0.86);
+  --painel: #262b33; --campo: #1a1e24; --hover: #333a45; --suave: #1f232a;
+  --selecao: #1e3358; --azul: #e3c463; --erro-fundo: #4a2428; --aviso-fundo: #4a3d1c;
+  --fundo-3d-a: #3a4658; --fundo-3d-b: #0d1626;
+  --icone-traco: #dfe2e7; --icone-neutro: #444b57;
+  color-scheme: dark;
+}
+/* Tático: preto e cinza com destaque verde-oliva. */
+:root[data-tema="tatico"] {
+  --sombra: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --fundo-app: #0a0b09; --faixa-topo: #1f211c; --fundo-faixa: #151613;
+  --borda: #2e3129; --texto: #e5e7de; --texto-fraco: #8f9486;
+  --destaque: #8fa142; --contexto: #c86a1c; --flutuante: rgba(23, 24, 21, 0.84);
+  --painel: #1a1b18; --campo: #0f100e; --hover: #282b23; --suave: #121310;
+  --selecao: #2f3a18; --azul: #bfd46a; --erro-fundo: #4a2020; --aviso-fundo: #45391a;
+  --fundo-3d-a: #33362d; --fundo-3d-b: #070806;
+  --icone-traco: #e0e3d6; --icone-neutro: #363a2f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; }
+html { overflow: clip; } /* a tela é fixa: nada deve rolar a página inteira para o lado */
+body {
+  font: 12px "Segoe UI", Arial, sans-serif;
+  color: var(--texto);
+  background: var(--fundo-faixa);
+  overflow: clip; /* hidden ainda deixa o foco rolar a tela para o lado (faixa larga) */
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+#app {
+  display: grid; grid-template-rows: 36px auto 1fr 40px;
+  grid-template-columns: minmax(0, 1fr); /* a faixa larga não alarga a tela */
+}
+
+/* Barra do aplicativo */
+.barra-app {
+  display: flex; align-items: center; gap: 2px; padding: 0 8px;
+  background: var(--fundo-app); color: var(--texto-app);
+}
+.barra-app button { padding: 4px 8px; border-radius: 4px; white-space: nowrap; }
+.barra-app .marca { white-space: nowrap; }
+.barra-app button:hover { background: rgba(255, 255, 255, 0.1); }
+.escolha-tema {
+  margin-left: 6px; padding: 2px 4px; font: inherit; color: var(--texto-app);
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px;
+}
+.escolha-tema option { color: var(--texto); background: var(--painel); }
+.aba-documento {
+  margin-left: 16px; padding: 6px 16px; background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px 6px 0 0; align-self: flex-end;
+  min-width: 0; max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.marca { margin-left: auto; font-weight: 700; letter-spacing: 1px; color: var(--destaque); }
+.ponte-ia { margin-left: auto; margin-right: 14px; font-size: 12px; color: #5fd17a; white-space: nowrap; }
+.ponte-ia.outra { color: #c9a94a; }
+.ponte-ia:not([hidden]) + .marca { margin-left: 0; }
+
+/* Faixa */
+.faixa {
+  position: relative; z-index: 10; /* menus abertos ficam por cima da janela 3D */
+  background: linear-gradient(var(--faixa-topo), var(--fundo-faixa)); border-bottom: 1px solid var(--borda);
+  box-shadow: var(--sombra);
+}
+.faixa-topo { display: flex; align-items: stretch; border-bottom: 1px solid var(--borda); }
+.area-trabalho {
+  padding: 6px 14px; font-weight: 700; border-right: 1px solid var(--borda);
+}
+.area-trabalho span { color: var(--texto-fraco); }
+.abas { display: flex; overflow-x: auto; }
+.aba {
+  padding: 6px 12px; font-weight: 600; color: var(--texto-fraco);
+  border-bottom: 3px solid transparent; white-space: nowrap;
+}
+.aba:hover { color: var(--texto); }
+.aba.ativa { color: var(--texto); border-bottom-color: var(--destaque); }
+.aba.contexto { color: #fff; background: var(--contexto); }
+.aba.contexto.ativa { border-bottom-color: #0d5c49; }
+
+/* Sem overflow aqui: senão os menus dos painéis ficam cortados. */
+.paineis { display: flex; padding: 4px 4px 0; }
+.painel {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  padding: 0 6px; border-right: 1px solid var(--borda);
+}
+.icones { display: flex; gap: 2px; min-height: 40px; align-items: center; }
+.ferramenta { padding: 3px; border-radius: 4px; line-height: 0; }
+.ferramenta:hover { background: var(--hover); }
+.nome-painel {
+  padding: 2px 6px 4px; font-size: 11px; font-weight: 600;
+  color: var(--texto-fraco); white-space: nowrap;
+}
+.nome-painel:hover { color: var(--texto); }
+
+.menu-painel, .submenu {
+  display: none; position: absolute; z-index: 20; min-width: 240px;
+  margin: 0; padding: 4px 0; list-style: none;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+/* Sem rolagem: rolagem cortaria os submenus laterais. */
+.menu-painel { top: 100%; left: 0; }
+.menu-painel li { padding-top: 3px; padding-bottom: 3px; }
+.menu-painel.aberto { display: block; }
+.menu-painel li {
+  position: relative; display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px; cursor: pointer; white-space: nowrap;
+}
+.menu-painel li:hover { background: var(--hover); }
+.menu-painel li b { margin-left: auto; color: var(--texto-fraco); font-weight: 400; }
+.submenu { top: -5px; left: 100%; }
+.tem-submenu:hover > .submenu { display: block; }
+
+/* Janela 3D e elementos flutuantes */
+.area-3d { position: relative; overflow: hidden; }
+.viewport {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 120% 90% at 50% 30%, var(--fundo-3d-a), var(--fundo-3d-b));
+}
+/* Painéis flutuantes com vidro fosco e sombra (profundidade). */
+.navegador, .barra-navegacao, .info-selecao {
+  backdrop-filter: blur(8px); box-shadow: var(--sombra);
+}
+.dialogo, .menu-painel, .submenu, .menu-contexto { box-shadow: var(--sombra); }
+.viewport canvas { display: block; width: 100%; height: 100%; }
+
+.navegador {
+  position: absolute; top: 8px; left: 8px; width: 240px; max-height: calc(100% - 70px);
+  overflow: auto; background: var(--flutuante); border: 1px solid var(--borda); border-radius: 4px;
+}
+.titulo-flutuante {
+  padding: 5px 8px; font-size: 11px; font-weight: 700; color: var(--texto-fraco);
+  border-bottom: 1px solid var(--borda);
+}
+.arvore, .arvore ul { margin: 0; padding: 0 0 0 12px; list-style: none; }
+.arvore { padding: 4px 4px 6px; }
+.no { display: flex; gap: 4px; padding: 2px 4px; border-radius: 3px; cursor: default; }
+.no:hover { background: var(--hover); }
+.seta { width: 10px; color: var(--texto-fraco); }
+
+.viewcube { position: absolute; top: 6px; right: 10px; width: 110px; height: 110px; }
+.viewcube canvas { display: block; }
+.casa {
+  position: absolute; top: 0; left: -14px; font-size: 16px; line-height: 1;
+  color: var(--texto-fraco);
+}
+.casa:hover { color: var(--destaque); }
+
+.barra-navegacao {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2px; padding: 3px; background: var(--flutuante);
+  border: 1px solid var(--borda); border-radius: 6px;
+}
+.barra-navegacao button { width: 30px; height: 26px; border-radius: 4px; font-size: 15px; }
+.barra-navegacao button:hover { background: var(--hover); }
+.barra-navegacao button.ligado { background: var(--destaque); color: #fff; }
+
+.aviso {
+  position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%);
+  padding: 6px 12px; background: var(--fundo-app); color: var(--texto-app);
+  border-radius: 4px; white-space: nowrap;
+  pointer-events: none; /* não atrapalha cliques na janela 3D */
+}
+
+.servidor-caiu {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 20;
+  max-width: min(640px, calc(100% - 32px)); padding: 8px 14px;
+  background: var(--erro-fundo); color: var(--texto-app); border: 1px solid #e05a4c; border-radius: 4px;
+  font-weight: 600; text-align: center;
+}
+.servidor-caiu[hidden] { display: none; }
+
+/* Linha do tempo */
+.linha-do-tempo {
+  display: flex; align-items: center; gap: 8px; padding: 0 8px;
+  background: var(--fundo-faixa); border-top: 1px solid var(--borda);
+}
+.controles-tempo button { padding: 2px 5px; color: var(--texto-fraco); }
+.controles-tempo button:hover { color: var(--texto); }
+.trilha {
+  display: flex; align-items: center; gap: 2px; flex: 1; height: 30px; padding: 0 4px;
+  background: var(--suave); border: 1px solid var(--borda); border-radius: 3px; overflow-x: auto;
+}
+.marcador-fim {
+  flex: none; width: 4px; height: 22px; margin-left: 2px;
+  background: var(--destaque); border-radius: 2px;
+}
+.item-tempo { line-height: 0; padding: 1px; border-radius: 3px; border: 2px solid transparent; }
+.item-tempo:hover { border-color: var(--destaque); }
+.item-tempo.com-erro { border-color: #d33; background: var(--erro-fundo); }
+.item-tempo.suprimida { opacity: 0.35; text-decoration: line-through; }
+.menu-contexto {
+  position: fixed; z-index: 50; margin: 0; padding: 4px 0; list-style: none;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+.menu-contexto li { padding: 5px 14px; cursor: pointer; }
+.menu-contexto li:hover { background: var(--hover); }
+
+/* Janela de comando (lado direito, abaixo do ViewCube) */
+.dialogo {
+  position: absolute; top: 130px; right: 10px; z-index: 5; width: 280px;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+.dialogo-titulo {
+  padding: 6px 10px; font-weight: 700; color: #fff; background: var(--fundo-app);
+  border-radius: 4px 4px 0 0;
+}
+.dialogo { display: flex; flex-direction: column; max-height: calc(100% - 140px); }
+.dialogo-corpo { padding: 8px 10px; display: grid; gap: 6px; overflow-y: auto; }
+.dialogo label { display: grid; grid-template-columns: 100px 1fr 28px; align-items: center; gap: 6px; }
+.dialogo input, .dialogo select {
+  width: 100%; padding: 3px 5px; font: inherit; border: 1px solid var(--borda); border-radius: 3px;
+}
+.dialogo em { color: var(--texto-fraco); font-style: normal; }
+.dialogo-botoes { display: flex; justify-content: flex-end; gap: 6px; padding: 8px 10px; border-top: 1px solid var(--borda); }
+.dialogo-botoes button { padding: 4px 14px; border: 1px solid var(--borda); border-radius: 3px; }
+.dialogo-botoes .ok { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+
+.status-nucleo { margin-left: 16px; color: #f2c94c; }
+.olho { padding: 0 3px; color: var(--destaque); font-size: 11px; }
+.olho.apagado { color: var(--borda); }
+.config-tempo { color: var(--texto-fraco); font-size: 15px; }
+
+/* Seleção */
+.no.selecionado { background: var(--selecao); color: var(--azul); font-weight: 600; }
+.info-selecao {
+  position: absolute; right: 10px; bottom: 10px; padding: 5px 10px;
+  background: var(--flutuante); border: 1px solid var(--borda); border-radius: 4px;
+}
+.dialogo label[hidden] { display: none; }
+.dialogo-selecao { font-weight: 600; color: var(--azul); }
+
+/* Cotas do esboço */
+.rotulos-cota { position: absolute; inset: 0; pointer-events: none; }
+.rotulo-cota {
+  position: absolute; transform: translate(-50%, -140%); pointer-events: auto;
+  padding: 1px 5px; font-size: 11px; color: var(--texto); background: var(--flutuante);
+  border: 1px solid #9aa6b2; border-radius: 3px; cursor: text; white-space: nowrap;
+}
+.editor-cota {
+  position: absolute; transform: translate(-50%, -140%); z-index: 6; width: 80px;
+  padding: 2px 4px; font: inherit; border: 2px solid var(--destaque); border-radius: 3px;
+}
+
+/* Menu Arquivo e recuperação */
+.menu-arquivo {
+  position: fixed; z-index: 60; min-width: 230px; margin: 0; padding: 4px 0; list-style: none;
+  background: var(--painel); color: var(--texto); border: 1px solid var(--borda); border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+.menu-arquivo li { display: flex; justify-content: space-between; gap: 16px; padding: 6px 14px; cursor: pointer; }
+.menu-arquivo li:hover { background: var(--hover); }
+.menu-arquivo em { color: var(--texto-fraco); font-style: normal; }
+.faixa-recuperacao {
+  position: fixed; z-index: 70; top: 44px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  background: var(--aviso-fundo); border: 1px solid #e8b44c; border-radius: 4px; box-shadow: 0 6px 18px rgba(0,0,0,.15);
+}
+.faixa-recuperacao button { padding: 4px 12px; border: 1px solid var(--borda); border-radius: 3px; background: var(--painel); }
+.faixa-recuperacao .recuperar { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+.entrada-arquivo { display: none; }
+
+/* Campo "Lados" do Polígono */
+.caixa-lados {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 6;
+  display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+  background: var(--flutuante); border: 1px solid var(--borda); border-radius: 4px;
+}
+.caixa-lados[hidden] { display: none; }
+.caixa-lados input { width: 52px; padding: 2px 4px; font: inherit; border: 1px solid var(--borda); border-radius: 3px; }
+
+/* Símbolos das restrições do esboço */
+.simbolo-restricao {
+  position: absolute; transform: translate(-50%, 35%); pointer-events: auto; cursor: pointer;
+  min-width: 14px; padding: 0 3px; font-size: 10px; line-height: 14px; text-align: center;
+  color: #1d232b; background: #fff8d6; border: 1px solid #c9a227; border-radius: 3px;
+}
+.simbolo-restricao.selecionado { background: #1f6fe0; color: #fff; border-color: #1f6fe0; }
+
+/* Medidas digitadas enquanto desenha */
+.caixa-medidas {
+  position: absolute; z-index: 6; display: grid; gap: 3px; padding: 4px 6px;
+  background: var(--painel); border: 1px solid var(--destaque); border-radius: 4px;
+  font-size: 11px; pointer-events: auto;
+}
+.caixa-medidas[hidden] { display: none; }
+.caixa-medidas label { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.caixa-medidas input { width: 64px; padding: 1px 3px; font: inherit; border: 1px solid var(--borda); border-radius: 2px; }
+
+/* Selo de esboço totalmente definido */
+.selo-definido {
+  position: absolute; top: 8px; left: 8px; z-index: 5; padding: 3px 8px; font-size: 11px;
+  background: #e8f6ec; color: #1d5b33; border: 1px solid #7cc496; border-radius: 4px;
+}
+.selo-definido[hidden] { display: none; }
+
+/* Resultado do Medir (várias linhas) */
+.dialogo-selecao { white-space: pre-line; }
+
+/* Janela Propriedades: texto comum, uma medida por linha */
+.dialogo.propriedades { width: 330px; }
+.dialogo.propriedades .dialogo-selecao { font-weight: 400; color: inherit; font-variant-numeric: tabular-nums; line-height: 1.5; }
+.dialogo.propriedades label > span:first-child { display: none; }
+.dialogo.propriedades label { display: block; }
+
+/* Painel do Deslocamento/Espelhar/Padrão no esboço */
+.painel-copia { flex-wrap: wrap; max-width: calc(100% - 24px); }
+.painel-copia label { display: flex; align-items: center; gap: 4px; }
+.painel-copia button { padding: 2px 8px; font: inherit; border: 1px solid var(--borda); border-radius: 3px; background: var(--painel); cursor: pointer; }
+
+/* Campos com expressão (parâmetros) */
+.dialogo input.com-expressao { font-style: italic; color: var(--azul); }
+.dialogo input.invalido { border-color: #d23b3b; background: var(--erro-fundo); }
+
+/* Janela Alterar parâmetros */
+.janela-parametros .jp-config tr.ativa td { background: var(--selecao); }
+.janela-parametros .jp-config input { width: 70px; }
+.janela-parametros .jp-config button { padding: 0 4px; }
+.janela-parametros .jp-salvar-conf { white-space: nowrap; }
+.janela-parametros {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 40;
+  width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 90px); display: flex; flex-direction: column;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 4px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+.jp-titulo { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-weight: 700; color: #fff; background: var(--fundo-app); border-radius: 4px 4px 0 0; }
+.jp-titulo button { color: #fff; background: none; border: 0; cursor: pointer; font-size: 14px; }
+.jp-corpo { overflow: auto; padding: 8px 10px; }
+.jp-secao { display: flex; align-items: center; gap: 8px; margin: 8px 0 4px; font-weight: 700; }
+.jp-secao button { width: 24px; height: 22px; font-weight: 700; cursor: pointer; border: 1px solid var(--borda); background: var(--painel); border-radius: 3px; }
+.janela-parametros table { width: 100%; border-collapse: collapse; }
+.janela-parametros th { text-align: left; font-weight: 600; color: var(--texto-fraco); border-bottom: 1px solid var(--borda); padding: 3px 4px; }
+.janela-parametros td { padding: 2px 4px; border-bottom: 1px solid var(--suave); }
+.janela-parametros tr.grupo td { font-weight: 600; background: var(--suave); }
+.janela-parametros input { width: 100%; padding: 2px 4px; font: inherit; border: 1px solid var(--borda); border-radius: 3px; }
+.janela-parametros input.invalido { border-color: #d23b3b; background: var(--erro-fundo); }
+.janela-parametros td.erro, .janela-parametros .erro { color: #d23b3b; }
+.janela-parametros td.vazio { color: var(--texto-fraco); font-style: italic; }
+.janela-parametros button[data-apagar] { border: 0; background: none; cursor: pointer; }
+.jp-dica { color: var(--texto-fraco); font-size: 12px; }
+.jp-botoes { display: flex; justify-content: flex-end; padding: 8px 10px; border-top: 1px solid var(--borda); }
+.jp-botoes button { padding: 4px 18px; color: #fff; background: #e8621c; border: 0; border-radius: 3px; cursor: pointer; }
+.editor-cota.invalido { border-color: #d23b3b; background: var(--erro-fundo); }
+
+/* Seleção de janela (arrastar com o botão esquerdo) */
+.janela-selecao { position: absolute; z-index: 4; pointer-events: none; border: 1px solid #1f6fe0; background: rgba(31, 111, 224, 0.12); }
+.janela-selecao.cruzando { border-style: dashed; background: rgba(46, 170, 90, 0.12); border-color: #2eaa5a; }
+.janela-selecao[hidden] { display: none; }
+
+/* Console de script */
+.janela-script { width: min(720px, calc(100vw - 32px)); }
+.janela-script .js-barra { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+.janela-script .js-barra select { flex: 1; min-width: 140px; }
+.janela-script .js-codigo { width: 100%; height: 240px; box-sizing: border-box; font: 13px/1.45 Consolas, "Cascadia Mono", monospace; tab-size: 2; resize: vertical; }
+.janela-script .js-saida { height: 140px; overflow: auto; margin: 6px 0 0; padding: 6px; background: #1d232b; color: #d6e2ee; font: 12px/1.4 Consolas, monospace; white-space: pre-wrap; border-radius: 4px; }
+.janela-script .js-saida .erro { color: #ff8a8a; }
+
+/* Falar com o Claude */
+.janela-voz { width: min(360px, calc(100vw - 32px)); top: auto; left: auto; right: 16px; bottom: 60px; transform: none; font-size: 13px; }
+.janela-voz .jp-titulo { cursor: move; user-select: none; touch-action: none; padding: 4px 8px; font-size: 12px; }
+.janela-voz .jp-titulo button { margin-left: 6px; }
+.janela-voz .jp-corpo { padding: 4px 8px; }
+/* Aparelho pequeno (padrão): corpo escuro, microfone redondo e visor */
+.janela-voz:not(.compacta) .voz-aparelho, .janela-voz.compacta .jp-corpo > :not(.voz-aparelho) { display: none; }
+.janela-voz.compacta {
+  width: 270px; border: 1px solid #000; border-radius: 16px;
+  background: linear-gradient(160deg, #2c3038, #121418);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.janela-voz.compacta .jp-titulo { background: none; color: #8a93a0; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; padding: 6px 12px 0; }
+.janela-voz.compacta .jp-titulo button { color: #8a93a0; font-size: 12px; }
+.janela-voz.compacta .jp-titulo button:hover { color: #fff; }
+.janela-voz.compacta .jp-corpo { padding: 6px 12px 12px; overflow: visible; }
+.voz-aparelho { display: flex; gap: 10px; align-items: center; cursor: move; touch-action: none; }
+.voz-mic-grande {
+  flex: none; width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; color: #e8edf3;
+  background: radial-gradient(circle at 35% 30%, #4a515c, #1b1e23 70%);
+  box-shadow: 0 0 0 3px #0b0c0e, 0 0 0 4px #3a3f47, inset 0 2px 3px rgba(255, 255, 255, 0.15);
+}
+.voz-mic-grande:hover { color: #4fd1ff; }
+.janela-voz:has(.voz-mic.ativo) .voz-mic-grande { color: #fff; background: radial-gradient(circle at 35% 30%, #ff6b6b, #b3121b 70%); animation: voz-pulso 1.2s infinite; }
+@keyframes voz-pulso {
+  0% { box-shadow: 0 0 0 3px #0b0c0e, 0 0 0 4px #ff5a5a; }
+  100% { box-shadow: 0 0 0 3px #0b0c0e, 0 0 0 14px rgba(255, 90, 90, 0); }
+}
+.voz-lcd { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid #000; border-radius: 8px; background: linear-gradient(#0b1a1f, #08262c); box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7); }
+.voz-eq { display: flex; gap: 3px; align-items: flex-end; height: 12px; margin-bottom: 4px; }
+.voz-eq i { width: 4px; height: 3px; border-radius: 1px; background: #36d6ff; opacity: 0.45; }
+.janela-voz:has(.voz-mic.ativo) .voz-eq i { opacity: 1; animation: voz-eq 0.7s ease-in-out infinite alternate; }
+.voz-eq i:nth-child(2n) { animation-delay: -0.35s !important; }
+.voz-eq i:nth-child(3n) { animation-delay: -0.2s !important; animation-duration: 0.5s !important; }
+@keyframes voz-eq { from { height: 2px; } to { height: 12px; } }
+.voz-tela { max-height: 4.1em; overflow: auto; white-space: pre-wrap; cursor: text; color: #7ff3ff; font: 12px/1.35 Consolas, ui-monospace, monospace; text-shadow: 0 0 6px rgba(80, 220, 255, 0.45); }
+.voz-tela-voce { color: #ffd479; text-shadow: 0 0 6px rgba(255, 200, 90, 0.4); }
+.voz-tela-erro { color: #ff8a8a; text-shadow: none; }
+.janela-voz .voz-linha { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.janela-voz .voz-linha[hidden], .janela-voz .voz-so-claude[hidden], .janela-voz .voz-so-ia[hidden] { display: none; }
+.janela-voz .voz-chave input[type="password"] { width: 220px; }
+.janela-voz .voz-conversa { height: 150px; overflow: auto; background: var(--suave); border: 1px solid var(--borda); border-radius: 4px; padding: 6px; }
+.janela-voz .voz-msg { margin: 4px 0; padding: 5px 8px; border-radius: 8px; max-width: 88%; white-space: pre-wrap; font-size: 13px; }
+.janela-voz .voz-voce { background: var(--selecao); margin-left: auto; }
+.janela-voz .voz-haxys { background: var(--painel); border: 1px solid var(--borda); }
+.janela-voz .voz-info { color: var(--texto-fraco); font-size: 12px; }
+.janela-voz .voz-erro { background: var(--erro-fundo); color: var(--texto); border: 1px solid #e05a4c; }
+.janela-voz .voz-texto { flex: 1; min-width: 160px; }
+.janela-voz .voz-mic.ativo { background: #d33; color: #fff; }
+.janela-voz .voz-miniatura { height: 48px; border-radius: 4px; }
+.janela-voz .voz-foto { position: relative; display: inline-block; }
+.janela-voz .voz-foto button { position: absolute; top: -6px; right: -6px; padding: 0 4px; font-size: 11px; line-height: 16px; }
+.janela-voz .voz-form-replica { display: grid; gap: 6px; padding: 8px; margin: 6px 0; border: 1px solid var(--borda); border-radius: 4px; background: var(--suave); }
+.janela-voz .voz-form-replica[hidden] { display: none; }
+.janela-voz .voz-form-replica label { display: grid; gap: 2px; font-size: 12px; }
+
+/* Caixas de digitar e listas seguem o tema */
+input, select, textarea { background: var(--campo); color: var(--texto); border-color: var(--borda); }
+
+/* Ícones (ui/icones.ts): traço e cinza do tema, cor do painel em --c */
+.ico { display: block; overflow: visible; }
+.ico .l, .ico .a, .ico .ok { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ico .l { stroke: var(--icone-traco); stroke-width: 1.5; }
+.ico .a { stroke: var(--destaque); stroke-width: 1.8; }
+.ico .ok { stroke: #2e9d57; stroke-width: 2.4; }
+.ico .f, .ico .m, .ico .n { stroke: var(--icone-traco); stroke-width: 1.1; stroke-linejoin: round; }
+.ico .f { fill: var(--c); }
+.ico .m { fill: color-mix(in srgb, var(--c) 40%, var(--icone-neutro)); }
+.ico .n { fill: var(--icone-neutro); }
+.ico text { fill: var(--icone-traco); font-family: "Segoe UI", Arial, sans-serif; font-weight: 700; }
+.ico text.branco { fill: #fff; stroke: none; }
+
+/* Janela de projetos (Abrir / Salvar como), arquivo/janelaProjetos.ts */
+.janela-projetos { width: min(900px, calc(100vw - 32px)); }
+/* Projetos em cartões com a imagem da peça, como os Recentes do Fusion */
+.jp-lista {
+  margin: 8px 0; padding: 8px; list-style: none; max-height: 60vh; overflow: auto;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px;
+  background: var(--suave); border: 1px solid var(--borda); border-radius: 4px;
+}
+.jp-lista li { display: flex; flex-direction: column; gap: 2px; padding: 6px; cursor: pointer; border: 1px solid var(--borda); border-radius: 4px; background: var(--painel); min-width: 0; }
+.jp-lista li:hover { background: var(--hover); }
+.jp-lista li.ativa { background: var(--selecao); color: var(--azul); font-weight: 600; border-color: var(--azul); }
+.jp-lista li.vazio { grid-column: 1 / -1; color: var(--texto-fraco); cursor: default; border: 0; background: none; }
+.jp-lista .jp-foto { height: 110px; display: grid; place-items: center; border-radius: 3px; background: linear-gradient(#3a414b, #262b32); color: #7d8792; font-size: 34px; overflow: hidden; }
+.jp-lista .jp-foto img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.jp-lista span { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jp-lista em { color: var(--texto-fraco); font-style: normal; font-size: 11px; white-space: nowrap; }
+.jp-nome { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; }
+.jp-nome input { padding: 4px 6px; font: inherit; color: var(--texto); background: var(--campo); border: 1px solid var(--borda); border-radius: 3px; }
+.jp-botoes { gap: 8px; }
+.jp-botoes button.secundario { margin-right: auto; color: var(--texto); background: none; border: 1px solid var(--borda); }
+.jp-botoes button { background: var(--destaque); }
+
+/* Navegador recolhido (seta no título) e tela limpa (botão ⛶ na barra de baixo) */
+.navegador .titulo-flutuante { display: flex; justify-content: space-between; align-items: center; }
+.navegador .recolher { padding: 0 4px; color: var(--texto-fraco); font-size: 12px; line-height: 1; }
+.navegador .recolher:hover { color: var(--destaque); }
+.navegador.recolhido { width: auto; }
+.navegador.recolhido .arvore { display: none; }
+.navegador.recolhido .titulo-flutuante { border-bottom: 0; gap: 8px; }
+#app.tela-limpa { grid-template-rows: 36px 1fr; }
+#app.tela-limpa .faixa, #app.tela-limpa .linha-do-tempo, #app.tela-limpa .navegador, #app.tela-limpa .info-selecao { display: none; }
+
+/* Marinho: texto escuro sobre os botões dourados (branco no dourado não dá leitura). */
+:root[data-tema="marinho"] :is(.barra-navegacao button.ligado, .dialogo-botoes .ok, .faixa-recuperacao .recuperar, .jp-botoes button:not(.secundario)) { color: #17130a; }
+
+/* Faixa estreita (ui/faixa.ts encolher): painel só com o nome; menus perto da borda abrem para a esquerda. */
+.painel.compacto .icones { display: none; }
+.painel.compacto .nome-painel { flex: 1; display: flex; align-items: center; }
+.menu-painel.a-direita { left: auto; right: 0; }
+.menu-painel.a-direita .submenu { left: auto; right: 100%; }
+.ferramenta.oculta { display: none; }
+.paineis.quebra { flex-wrap: wrap; }
+.area-trabalho { white-space: nowrap; }
+.janela-voz.soltando { outline: 3px dashed #36d6ff; outline-offset: 3px; }
+.voz-chip { margin-left: auto; padding: 0 5px; border: 1px solid #2a5866; border-radius: 3px; background: none; color: #5d8e9b; font: 600 9px/14px Consolas, ui-monospace, monospace; letter-spacing: 0.08em; cursor: pointer; }
+.voz-chip.ligado { color: #7ff3ff; border-color: #36d6ff; }
+
+/* Ligar IA e modo "O que é isto?" (barra de cima) */
+.barra-app .botao-ligar-ia { margin-left: 10px; color: #e8c27a; }
+.barra-app .botao-ajuda { width: 26px; height: 26px; margin-left: 4px; padding: 0; border-radius: 50%; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.3); }
+.barra-app .botao-ajuda.ligado { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+body.modo-ajuda, body.modo-ajuda * { cursor: help !important; }
+.ajuda-caixa {
+  position: fixed; z-index: 1000; max-width: 300px; padding: 8px 10px; pointer-events: auto;
+  background: var(--painel); color: var(--texto); border: 1px solid var(--destaque); border-radius: 6px; box-shadow: var(--sombra); font-size: 13px;
+}
+.ajuda-caixa b { display: block; margin-bottom: 2px; color: var(--destaque); }
+.ajuda-caixa p { margin: 0; line-height: 1.35; }
+.ajuda-caixa p:empty { display: none; }
+.ajuda-caixa button, .ajuda-rodape button { margin-top: 6px; padding: 2px 8px; cursor: pointer !important; border: 1px solid var(--borda); border-radius: 4px; background: var(--suave); color: var(--texto); }
+.ajuda-rodape {
+  position: fixed; z-index: 1000; left: 50%; bottom: 48px; transform: translateX(-50%); padding: 6px 14px;
+  background: var(--fundo-app); color: var(--texto-app); border: 1px solid var(--destaque); border-radius: 18px; box-shadow: var(--sombra); font-size: 13px;
+}
+.ajuda-rodape button { margin: 0 0 0 8px; }
+
+/* Assistente de ligação da IA e tutorial */
+.assistente-ia, .tutorial { z-index: 60; width: min(560px, calc(100vw - 32px)); }
+.assistente-ia .jp-corpo, .tutorial .jp-corpo { padding: 12px 16px; line-height: 1.4; }
+.assistente-ia p, .tutorial p { margin: 6px 0; }
+.ai-aviso { padding: 8px 10px; background: var(--aviso-fundo); color: var(--texto); border-left: 3px solid #d4a548; border-radius: 4px; font-size: 13px; }
+.ai-caminhos { display: grid; gap: 8px; margin: 10px 0; }
+.ai-caminhos button {
+  display: grid; gap: 2px; text-align: left; padding: 8px 12px; cursor: pointer; color: var(--texto);
+  background: var(--suave); border: 1px solid var(--borda); border-radius: 6px;
+}
+.ai-caminhos button:hover:not(:disabled) { border-color: var(--destaque); background: var(--hover); }
+.ai-caminhos button:disabled { opacity: 0.55; cursor: not-allowed; }
+.ai-caminhos span { font-size: 12px; color: var(--texto-fraco); }
+.ai-precos, .ai-nota { font-size: 12px; color: var(--texto-fraco); }
+.assistente-ia a { color: var(--azul); }
+.ai-voltar { padding: 2px 8px; cursor: pointer; border: 1px solid var(--borda); border-radius: 4px; background: var(--suave); color: var(--texto); }
+.ai-passos { margin: 6px 0; padding-left: 20px; }
+.ai-campo { display: grid; gap: 2px; margin: 8px 0; font-size: 13px; }
+.ai-campo input { padding: 5px 8px; font: inherit; color: var(--texto); background: var(--campo); border: 1px solid var(--borda); border-radius: 4px; }
+.ai-botoes { display: flex; gap: 8px; margin-top: 12px; }
+.ai-botoes span { flex: 1; }
+.ai-botoes button { padding: 5px 14px; cursor: pointer; border: 1px solid var(--borda); border-radius: 4px; background: var(--suave); color: var(--texto); }
+.ai-botoes button:last-child, .tut-ligar { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+.ai-botoes button:disabled { opacity: 0.5; }
+.ai-resultado { font-size: 13px; }
+.ai-bom { color: #1f8a3a; }
+.ai-ruim { color: #c0392b; }
+.ai-ok { font-size: 15px; }
+.tut-titulo { font-size: 17px; font-weight: 700; color: var(--destaque); }
+.tut-ligar { padding: 5px 14px; cursor: pointer; border-radius: 4px; border: 1px solid; }
+.tutorial-foco { outline: 3px solid var(--destaque) !important; outline-offset: -3px; }
+.voz-ligar.chamar { background: var(--destaque); color: #fff; border-color: var(--destaque); }
+.pagina-ligar-ia { min-height: 100vh; background: radial-gradient(circle at 50% 30%, #2a3442, #11161d); }
+.pagina-ligar-ia .assistente-ia { top: 50%; transform: translate(-50%, -50%); }
+
+/* Celular: o botão 📱 (QR code) só aparece no PC */
+html.celular .botao-celular { display: none; }
+.janela-celular { width: min(460px, calc(100vw - 32px)); }
+.janela-celular .cel-qr { width: 240px; margin: 4px auto 8px; background: #fff; border-radius: 6px; line-height: 0; }
+.janela-celular .cel-qr svg { width: 100%; height: auto; }
+.janela-celular ol { margin: 6px 0; padding-left: 20px; line-height: 1.5; }
+.janela-celular a { color: var(--azul); }
+
+/* ===== HAXYS CAD no celular (html.celular: ver index.html e ui/celular.ts) ===== */
+html.celular body { font-size: 14px; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+html.celular #app {
+  height: 100dvh; grid-template-rows: 44px auto 1fr 44px;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+html.celular input, html.celular textarea, html.celular select { font-size: 16px !important; -webkit-user-select: text; user-select: text; } /* iPhone não dá zoom em letra de 16 px */
+/* Linhas que não cabem rolam para o lado com o dedo (nada fica escondido) */
+html.celular .barra-app, html.celular .abas, html.celular .paineis {
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+html.celular .barra-app::-webkit-scrollbar, html.celular .abas::-webkit-scrollbar, html.celular .paineis::-webkit-scrollbar { display: none; }
+html.celular .barra-app > * { flex: none; }
+html.celular .barra-app button { min-width: 38px; min-height: 36px; font-size: 16px; }
+html.celular .barra-app .marca { display: none; }
+html.celular .aba-documento { max-width: 45vw; margin-left: 6px; padding: 6px 10px; }
+html.celular .area-trabalho, html.celular .aba { padding: 10px 12px; }
+html.celular .paineis { flex-wrap: nowrap; }
+html.celular .painel { flex: none; }
+html.celular .ferramenta { padding: 5px; }
+html.celular .nome-painel { padding: 4px 8px 6px; font-size: 12px; }
+/* Menus (painéis, Arquivo, botão direito): gaveta embaixo, itens grandes, submenus abertos dentro */
+html.celular .menu-painel.aberto, html.celular .menu-arquivo:not([hidden]), html.celular .menu-contexto:not([hidden]) {
+  position: fixed !important; inset: auto 6px calc(6px + env(safe-area-inset-bottom)) 6px !important;
+  max-height: 65dvh; min-width: 0; overflow-y: auto; z-index: 80; border-radius: 12px;
+  box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.45);
+}
+html.celular .menu-painel li, html.celular .menu-arquivo li, html.celular .menu-contexto li { min-height: 44px; padding: 8px 14px; white-space: normal; }
+html.celular .menu-arquivo em { display: none; } /* atalhos de teclado */
+html.celular .menu-painel .submenu { display: block; position: static; min-width: 0; padding: 0 0 0 18px; border: 0; box-shadow: none; background: none; }
+html.celular .menu-painel .tem-submenu { flex-wrap: wrap; }
+html.celular .menu-painel .tem-submenu > b { display: none; }
+html.celular .menu-painel .tem-submenu > .submenu { flex-basis: 100%; }
+/* Janela 3D */
+html.celular .navegador { width: min(240px, 62vw); max-height: 45%; }
+html.celular .viewcube { transform: scale(0.8); transform-origin: top right; }
+html.celular .barra-navegacao { bottom: 8px; }
+html.celular .barra-navegacao button { width: 40px; height: 38px; font-size: 18px; }
+html.celular .info-selecao { bottom: 56px; right: 6px; max-width: calc(100% - 12px); }
+html.celular .aviso { bottom: 104px; max-width: calc(100% - 16px); white-space: normal; text-align: center; }
+html.celular .barra-celular {
+  position: absolute; left: 6px; bottom: 56px; display: flex; flex-direction: column; gap: 6px; z-index: 4;
+}
+html.celular .barra-celular button {
+  min-width: 52px; height: 40px; padding: 0 10px; font-weight: 700; color: var(--texto);
+  background: var(--flutuante); border: 1px solid var(--borda); border-radius: 8px; box-shadow: var(--sombra);
+  backdrop-filter: blur(8px);
+}
+html.celular .barra-celular button.ligado { background: var(--destaque); color: #fff; border-color: var(--destaque); }
+/* Janelas de comando e janelas grandes: largura da tela, embaixo */
+html.celular .dialogo {
+  position: fixed; top: auto !important; bottom: calc(6px + env(safe-area-inset-bottom)); left: 6px !important; right: 6px !important;
+  width: auto !important; max-height: 55dvh; z-index: 30; border-radius: 10px;
+}
+html.celular .dialogo label { grid-template-columns: 110px 1fr 32px; min-height: 40px; }
+html.celular .dialogo-botoes button, html.celular .jp-botoes button, html.celular .ai-botoes button { min-height: 42px; padding: 6px 18px; }
+html.celular .janela-parametros {
+  top: calc(6px + env(safe-area-inset-top)) !important; left: 6px !important; right: 6px !important; bottom: auto !important;
+  width: auto !important; max-height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); transform: none !important;
+}
+/* IA no celular: a tela principal. Expandida = gaveta grande embaixo (conversa + campo + botões grandes);
+   ▾ minimiza para o aparelho pequeno (microfone + visor com a última resposta) e a peça aparece. */
+html.celular .janela-voz:not(.compacta) {
+  top: auto !important; bottom: calc(6px + env(safe-area-inset-bottom)) !important; height: min(62dvh, 520px); max-height: none;
+  display: flex; flex-direction: column; font-size: 15px; border-radius: 14px; z-index: 40;
+}
+html.celular .janela-voz:not(.compacta) .jp-titulo { font-size: 15px; padding: 6px 8px 6px 14px; }
+html.celular .janela-voz:not(.compacta) .jp-corpo { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 8px 10px 10px; }
+html.celular .janela-voz .jp-fechar { display: none; } /* no celular ela minimiza, não fecha */
+html.celular .janela-voz.ajustes .voz-ajustes { background: var(--destaque); color: #fff; border-radius: 6px; }
+html.celular .janela-voz:not(.ajustes) .voz-opcoes { display: none; }
+html.celular .janela-voz .voz-opcoes .voz-mic { display: none; } /* no celular o microfone é o 🎤 grande, ao lado do campo */
+html.celular .janela-voz:has(.voz-mic.ativo) .voz-teclado { background: #d33; color: #fff; border-color: #d33; }
+.janela-voz .voz-ligar[hidden] { display: none; }
+html.celular .janela-voz .voz-conversa { flex: 1; height: auto; min-height: 80px; padding: 8px; border-radius: 10px; }
+html.celular .janela-voz .voz-msg { font-size: 15px; padding: 8px 11px; border-radius: 12px; }
+html.celular .janela-voz .voz-pedido { flex-wrap: nowrap; margin: 10px 0 0; }
+html.celular .janela-voz .voz-texto { min-width: 0; height: 50px; padding: 0 14px; border: 2px solid var(--destaque); border-radius: 25px; }
+html.celular .janela-voz .voz-teclado, html.celular .janela-voz .voz-enviar {
+  flex: none; height: 50px; border-radius: 25px; font-size: 17px; font-weight: 700; border: 0;
+}
+html.celular .janela-voz .voz-teclado { width: 50px; padding: 0; font-size: 22px; background: var(--suave); border: 1px solid var(--borda); }
+html.celular .janela-voz .voz-enviar { padding: 0 18px; background: var(--destaque); color: #fff; }
+html.celular .janela-voz.compacta {
+  left: auto !important; right: 6px !important; width: calc(100% - 76px) !important; max-width: 340px; top: auto !important; bottom: 104px !important;
+}
+html.celular .janela-voz.compacta .jp-titulo button { font-size: 18px; min-width: 40px; min-height: 32px; }
+html.celular .janela-voz.compacta .voz-mic-grande { width: 60px; height: 60px; }
+html.celular .janela-voz.compacta .voz-tela { font-size: 13px; }
+html.celular .jp-titulo button { min-width: 40px; min-height: 36px; font-size: 18px; }
+html.celular .jp-lista { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+/* Linha do tempo */
+html.celular .controles-tempo button { padding: 6px 7px; font-size: 15px; }
+html.celular .janela-voz.compacta .voz-ajustes { display: none; }

@@ -1,0 +1,23 @@
+# Gerado / instalado (refaz com npm install / npm run build)
+node_modules/
+dist/
+# Senha da ponte MCP: nunca guardar no git
+ponte/segredo.txt
+# Arquivos de saída de testes (3MF, fotos, exportações)
+saida/
+*.log
+projetos/.miniaturas/
+# Ligação da IA da pessoa (pode ter chave de API): nunca no git
+ia.json
+# Gerados pelo npm run servidor / instalador
+app/servidor.mjs
+instalador/
+# Código secreto do celular pareado (HAXYS CAD móvel): nunca no git
+celular.txt
+celular-certificado.json
+
+# Modelos visuais do brainstorming
+.superpowers/
+
+# Termos pessoais da varredura do publicar.mjs: nunca no git
+ferramentas/termos-privados.txt

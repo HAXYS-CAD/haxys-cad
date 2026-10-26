@@ -1,0 +1,24 @@
+Unidades: milímetros e graus. Eixo Y é para cima (a mesa da impressora é o plano XZ, y = 0).
+Caixa: centro em x/z, base em y (sobe "altura"). Cilindro: em pé no eixo Y, centro da base em (x, y, z). Esfera: centro em (x, y, z).
+modo: "novo" (corpo novo), "unir", "cortar", "intersecao" (os três últimos com os corpos que a peça toca).
+API (use await nas que criam ou mudam; cada uma espera o cálculo e lança erro se a operação falhar):
+  haxys.caixa({ comprimento, largura, altura, x, y, z, modo })   // comprimento em X, largura em Z
+  haxys.cilindro({ diametro, altura, x, y, z, modo })
+  haxys.esfera({ diametro, x, y, z, modo })
+  haxys.toroide({ diametro, diametroSecao, x, y, z, modo })
+  haxys.esboco({ plano: "XY"|"XZ"|"YZ", linhas: [[u,v],...], fechado: true, circulos: [{u, v, r}] })  // devolve o nome
+     plano XZ (o chão): u = X, v = -Z (v positivo vai para Z negativo); extrusão sobe em +Y
+     plano XY (de frente): u = X, v = Y; extrusão vai para +Z
+     plano YZ (de lado): u = -Z, v = Y; extrusão vai para +X
+  haxys.extrusao({ esboco: nome, distancia, modo, perfis: [0,...] })  // extruda na normal do plano
+  haxys.furo({ diametro, corpo?, x?, z?, profundidade? })   // furo vertical; sem x/z = centro do corpo
+  haxys.arredondar(raio, corpo?) · haxys.chanfrar(distancia, corpo?)   // todas as arestas
+  haxys.parametro(nome, expressao) · haxys.mudar(nomeOperacao, medida, valor) · haxys.remover(nomeOperacao)
+  haxys.desfazer() · haxys.refazer()
+  haxys.corpos() · haxys.ultimoCorpo() · haxys.caixaDe(corpo) → { min, max, tamanho } · haxys.operacoes() · haxys.erros()
+  haxys.propriedades(corpo) → linhas de texto (volume, massa...)
+  haxys.adicionar({ tipo, params, opcoes, corpos, referencias })  // qualquer operação do programa (avançado)
+  haxys.imprimir()   // manda para o Bambu Studio
+  log(...)           // escreve no registro
+O valor que o script devolver com "return" é mostrado à pessoa.
+Se a pessoa mandar uma imagem de uma peça, estime as medidas (pergunte se faltar escala) e modele com as peças acima.
