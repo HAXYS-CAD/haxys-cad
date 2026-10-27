@@ -17,7 +17,8 @@
 import http from "node:http";
 import { spawn } from "node:child_process";
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import readline from "node:readline";
@@ -34,8 +35,23 @@ const NODE_INSTALADO = join(process.env.ProgramFiles ?? "C:/Program Files", "nod
 const NODE = existsSync(NODE_INSTALADO) ? NODE_INSTALADO : process.execPath;
 const VERSOES = ["2025-06-18", "2025-03-26", "2024-11-05"];
 
+// Senha e URL do túnel ficam junto da ponte; se o Windows não deixa gravar ali
+// (programa instalado em Program Files), ficam em %LOCALAPPDATA%\HAXYS CAD.
+const PASTA_SENHA = (() => {
+  try {
+    const teste = join(AQUI, ".gravavel");
+    writeFileSync(teste, "");
+    unlinkSync(teste);
+    return AQUI;
+  } catch {
+    const pasta = join(process.env.LOCALAPPDATA ?? homedir(), "HAXYS CAD");
+    mkdirSync(pasta, { recursive: true });
+    return pasta;
+  }
+})();
+
 function segredo() {
-  const arq = join(AQUI, "segredo.txt");
+  const arq = join(PASTA_SENHA, "segredo.txt");
   if (!existsSync(arq)) writeFileSync(arq, randomBytes(18).toString("base64url"));
   return readFileSync(arq, "utf8").trim();
 }
@@ -483,7 +499,7 @@ function servidor() {
   });
   srv.listen(PORTA, "127.0.0.1", () => {
     console.log(`Ponte HAXYS ligada: MCP local em http://127.0.0.1:${PORTA}/mcp`);
-    console.log(`Pelo túnel: https://<endereço-do-túnel>/mcp/<senha de ponte\\segredo.txt>`);
+    console.log(`Pelo túnel: https://<endereço-do-túnel>/mcp/<senha de ${join(PASTA_SENHA, "segredo.txt")}>`);
   });
 }
 
@@ -557,12 +573,12 @@ async function modoTunel() {
     if (!m || achou) return;
     achou = true;
     const url = `${m[0]}/mcp/${segredo()}`;
-    writeFileSync(join(AQUI, "URL_PARA_A_IA.txt"), url + "\r\n");
+    writeFileSync(join(PASTA_SENHA, "URL_PARA_A_IA.txt"), url + "\r\n");
     const linha = "=".repeat(64);
     console.log(["", linha,
       " Endereço do conector HAXYS para a IA (cole no ChatGPT/Claude/Gemini):",
       " " + url,
-      " (também anotado em ponte/URL_PARA_A_IA.txt)",
+      ` (também anotado em ${join(PASTA_SENHA, "URL_PARA_A_IA.txt")})`,
       " Não mostre este endereço a ninguém: ele dá acesso ao seu HAXYS.",
       " Deixe esta janela aberta enquanto usar. Fechar = desligar o túnel.",
       linha, ""].join("\n"));

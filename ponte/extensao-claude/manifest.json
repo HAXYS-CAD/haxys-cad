@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "haxys-cad",
   "display_name": "HAXYS CAD",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Abre o HAXYS CAD e constrói peças 3D por conversa.",
   "long_description": "Conector do HAXYS CAD (CAD 3D local parecido com o Autodesk Fusion). A IA abre o programa, constrói peças com ações de CAD (caixa, cilindro, esboço, extrusão, furo, arredondar...), vê a tela e manda imprimir no Bambu Studio. Precisa do HAXYS CAD instalado neste computador.",
   "author": { "name": "HAXYS" },

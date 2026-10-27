@@ -4,9 +4,14 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-const PONTE = process.env.HAXYS_PONTE ?? join(process.env.LOCALAPPDATA ?? "", "Programs", "HAXYS CAD", "resources", "ponte", "haxys-ponte.mjs");
-if (!existsSync(PONTE)) {
-  console.error(`Não achei a ponte do HAXYS CAD em ${PONTE}. Instale o HAXYS CAD ou defina HAXYS_PONTE.`);
+// O instalador põe o programa só para o usuário (LOCALAPPDATA) ou para todos (Program Files).
+const LUGARES = process.env.HAXYS_PONTE
+  ? [process.env.HAXYS_PONTE]
+  : [join(process.env.LOCALAPPDATA ?? "", "Programs"), process.env.ProgramFiles ?? "C:\\Program Files"]
+      .map((base) => join(base, "HAXYS CAD", "resources", "ponte", "haxys-ponte.mjs"));
+const PONTE = LUGARES.find((lugar) => existsSync(lugar));
+if (!PONTE) {
+  console.error(`Não achei a ponte do HAXYS CAD em ${LUGARES.join(" nem em ")}. Instale o HAXYS CAD ou defina HAXYS_PONTE.`);
   process.exit(1);
 }
 if (!process.argv.includes("--stdio")) process.argv.push("--stdio");
