@@ -1,5 +1,15 @@
 # Novidades · Changelog
 
+## 0.1.1 — conserto da ponte das IAs · AI bridge fix
+
+- Com o programa instalado em `C:\Program Files\HAXYS CAD`, a ponte MCP caía ao ligar (não podia gravar a senha ali).
+  Agora a senha fica em `%LOCALAPPDATA%\HAXYS CAD`. Quem instalou só para o próprio usuário não muda nada.
+- Conector do Claude Desktop (`HAXYS_CAD.mcpb` 1.0.1) acha o HAXYS CAD nos dois lugares de instalação.
+
+**English:** with HAXYS CAD installed in Program Files, the MCP bridge crashed on start (it could not write its secret
+there); the secret now lives in `%LOCALAPPDATA%\HAXYS CAD`. The Claude Desktop connector (`HAXYS_CAD.mcpb` 1.0.1) finds
+HAXYS CAD in both install locations.
+
 ## 0.1.0 — primeira versão pública · first public release
 
 - Programa do PC com a organização de tela do Autodesk Fusion: esboço, sólido, superfície, malha, montagem, inspeção e anotações.
