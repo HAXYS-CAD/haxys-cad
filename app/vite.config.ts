@@ -245,7 +245,8 @@ function lerLigacao(): Ligacao {
 }
 const PONTE_HTTP = "http://127.0.0.1:27186";
 async function garantirPonte() {
-  const viva = () => fetch(`${PONTE_HTTP}/saude`, { signal: AbortSignal.timeout(1500) }).then((r) => r.ok, () => false);
+  // Lê a resposta até o fim: resposta não lida de servidor que fecha a conexão derruba o Node 24 (undici).
+  const viva = () => fetch(`${PONTE_HTTP}/saude`, { signal: AbortSignal.timeout(1500) }).then((r) => r.arrayBuffer().then(() => r.ok), () => false);
   if (await viva()) return;
   spawn(NODE_EXE, [PONTE], { detached: true, stdio: "ignore", windowsHide: true, env: { ...process.env, ...COMO_NODE } }).unref();
   for (let i = 0; i < 40; i++) {

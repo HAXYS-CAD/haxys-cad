@@ -22,10 +22,11 @@ Your phone opens **the same HAXYS CAD running on your PC**, with a touch layout.
 
 ## Using it
 
-- **🎤** talks to the AI. **▾** minimizes the box to see the part; **▴** brings it back.
-- **Photos:** attach photos of the part you want to copy.
-- **Esc** and **＋ Somar** (add to selection) on the touch bar; long-press = right-click.
-- Exporting downloads the file to the phone and also saves it on the PC.
+- A clean screen: top bar (File, Save, Export…), the part, the view cube and the AI box.
+- AI box: **🖼** sends an image, a text field and **🎤** talks to the AI (it turns into **➤** when there is text).
+- **—** turns the box into a small dot to see the part; tap the dot to bring it back, drag it to move it.
+- One finger rotates, two fingers (pinch) zoom and pan; long-press = right-click.
+- File → Export downloads the file to the phone and also saves it on the PC.
 
 ## Coming soon: without the PC
 

@@ -23,7 +23,8 @@ if (!app.requestSingleInstanceLock()) app.quit();
 process.env.HAXYS_DADOS ??= join(app.getPath("documents"), "HAXYS CAD");
 mkdirSync(process.env.HAXYS_DADOS, { recursive: true });
 
-const noAr = (url) => fetch(url, { signal: AbortSignal.timeout(1500) }).then((r) => r.ok, () => false);
+// Lê a resposta até o fim: resposta não lida de outro programa na porta (que fecha a conexão) derruba o Node (undici).
+const noAr = (url) => fetch(url, { signal: AbortSignal.timeout(1500) }).then((r) => r.arrayBuffer().then(() => r.ok), () => false);
 
 async function ligarServidor() {
   if (await noAr(`${ENDERECO}api/ia`)) return null;

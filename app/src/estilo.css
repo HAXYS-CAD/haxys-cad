@@ -700,28 +700,35 @@ html.celular .janela-voz:not(.compacta) {
 html.celular .janela-voz:not(.compacta) .jp-titulo { font-size: 15px; padding: 6px 8px 6px 14px; }
 html.celular .janela-voz:not(.compacta) .jp-corpo { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 8px 10px 10px; }
 html.celular .janela-voz .jp-fechar { display: none; } /* no celular ela minimiza, não fecha */
-html.celular .janela-voz.ajustes .voz-ajustes { background: var(--destaque); color: #fff; border-radius: 6px; }
-html.celular .janela-voz:not(.ajustes) .voz-opcoes { display: none; }
-html.celular .janela-voz .voz-opcoes .voz-mic { display: none; } /* no celular o microfone é o 🎤 grande, ao lado do campo */
+html.celular .janela-voz .voz-opcoes { display: none; } /* no celular só texto, imagem e voz: a IA usada é a ligada no PC */
 html.celular .janela-voz:has(.voz-mic.ativo) .voz-teclado { background: #d33; color: #fff; border-color: #d33; }
+/* 🎤 vira ➤ quando há texto (enquanto ouve, o 🎤 fica para parar) */
+html.celular .janela-voz:has(.voz-texto:not(:placeholder-shown)):not(:has(.voz-mic.ativo)) .voz-teclado,
+html.celular .janela-voz:is(:has(.voz-texto:placeholder-shown), :has(.voz-mic.ativo)) .voz-enviar { display: none; }
 .janela-voz .voz-ligar[hidden] { display: none; }
 html.celular .janela-voz .voz-conversa { flex: 1; height: auto; min-height: 80px; padding: 8px; border-radius: 10px; }
 html.celular .janela-voz .voz-msg { font-size: 15px; padding: 8px 11px; border-radius: 12px; }
 html.celular .janela-voz .voz-pedido { flex-wrap: nowrap; margin: 10px 0 0; }
 html.celular .janela-voz .voz-texto { min-width: 0; height: 50px; padding: 0 14px; border: 2px solid var(--destaque); border-radius: 25px; }
-html.celular .janela-voz .voz-teclado, html.celular .janela-voz .voz-enviar {
-  flex: none; height: 50px; border-radius: 25px; font-size: 17px; font-weight: 700; border: 0;
+html.celular .janela-voz .voz-anexar, html.celular .janela-voz .voz-teclado, html.celular .janela-voz .voz-enviar {
+  flex: none; width: 50px; height: 50px; padding: 0; border-radius: 25px; font-size: 22px; border: 1px solid var(--borda); background: var(--suave);
 }
-html.celular .janela-voz .voz-teclado { width: 50px; padding: 0; font-size: 22px; background: var(--suave); border: 1px solid var(--borda); }
-html.celular .janela-voz .voz-enviar { padding: 0 18px; background: var(--destaque); color: #fff; }
+html.celular .janela-voz .voz-enviar { background: var(--destaque); color: #fff; border-color: var(--destaque); }
+/* Minimizada: só um pontinho de 16 px (área de toque de 44 px). Tocar abre; arrastar muda de lugar. */
 html.celular .janela-voz.compacta {
-  left: auto !important; right: 6px !important; width: calc(100% - 76px) !important; max-width: 340px; top: auto !important; bottom: 104px !important;
+  left: var(--px, calc(100% - 52px)) !important; top: var(--py, calc(100% - 120px)) !important; right: auto !important; bottom: auto !important;
+  width: 44px !important; height: 44px; max-width: none; background: none; border: 0; box-shadow: none; touch-action: none;
 }
-html.celular .janela-voz.compacta .jp-titulo button { font-size: 18px; min-width: 40px; min-height: 32px; }
-html.celular .janela-voz.compacta .voz-mic-grande { width: 60px; height: 60px; }
-html.celular .janela-voz.compacta .voz-tela { font-size: 13px; }
+html.celular .janela-voz.compacta > * { display: none; }
+html.celular .janela-voz.compacta::after {
+  content: ""; position: absolute; inset: 14px; border-radius: 50%; background: var(--destaque);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4), 0 0 10px var(--destaque);
+}
+html.celular .janela-voz.compacta:has(.voz-mic.ativo)::after { background: #d33; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4), 0 0 10px #d33; }
 html.celular .jp-titulo button { min-width: 40px; min-height: 36px; font-size: 18px; }
 html.celular .jp-lista { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 /* Linha do tempo */
 html.celular .controles-tempo button { padding: 6px 7px; font-size: 15px; }
-html.celular .janela-voz.compacta .voz-ajustes { display: none; }
+/* Tela limpa no celular: barra de cima (Arquivo, Salvar, Exportar…), a peça, o cubo de vistas e a IA. */
+html.celular #app { grid-template-rows: 44px 1fr; }
+html.celular :is(.faixa, .linha-do-tempo, .navegador, .barra-navegacao, .info-selecao, .barra-celular) { display: none !important; }

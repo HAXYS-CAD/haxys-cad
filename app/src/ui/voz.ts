@@ -95,7 +95,7 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
   const el = document.createElement("div");
   el.className = "janela-parametros janela-voz";
   el.innerHTML = `
-    <div class="jp-titulo" title="Arraste para mudar de lugar"><span>HAXYS CAD · IA</span><span>${noCelular ? `<button class="voz-ajustes" title="Opções da IA">⚙</button>` : ""}<button class="voz-encolher" title="Painel completo / aparelho pequeno">⤢</button><button class="jp-fechar" title="Fechar">✕</button></span></div>
+    <div class="jp-titulo" title="Arraste para mudar de lugar"><span>HAXYS CAD · IA</span><span><button class="voz-encolher" title="Painel completo / aparelho pequeno">⤢</button><button class="jp-fechar" title="Fechar">✕</button></span></div>
     <div class="jp-corpo">
       <div class="voz-aparelho">
         <button class="voz-mic-grande" title="Falar / parar">
@@ -130,7 +130,7 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
         <div class="voz-info rp-impressora"></div>
         <div class="voz-linha"><button class="rp-enviar">Replicar</button><button class="rp-cancelar">Cancelar</button></div>
       </div>
-      <div class="voz-linha voz-pedido">${noCelular ? `<button class="voz-teclado" title="Falar com a IA">🎤</button>` : ""}<input class="voz-texto" placeholder="${noCelular ? "Descreva a peça…" : "Fale ou digite: faça um cubo de 30 mm com um furo de 10 no meio"}"><button class="voz-enviar">Enviar</button></div>
+      <div class="voz-linha voz-pedido">${noCelular ? `<button class="voz-anexar voz-so-codex" title="Mandar imagem" aria-label="Mandar imagem">🖼</button>` : ""}<input class="voz-texto" placeholder="${noCelular ? "Descreva a peça…" : "Fale ou digite: faça um cubo de 30 mm com um furo de 10 no meio"}">${noCelular ? `<button class="voz-teclado" title="Falar com a IA" aria-label="Falar com a IA">🎤</button>` : ""}<button class="voz-enviar"${noCelular ? ` aria-label="Enviar"` : ""}>${noCelular ? "➤" : "Enviar"}</button></div>
     </div>`;
   document.body.appendChild(el);
   aberto = el;
@@ -184,24 +184,56 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
   // No celular abre completa: a voz é o 🎤 do teclado, na caixa de texto.
   el.classList.toggle("compacta", !noCelular && ler("haxys.vozCompleta") !== "1");
   const encolher = $<HTMLButtonElement>(".voz-encolher");
-  // Celular: a IA é a tela principal; ▾ minimiza para ver a peça, ▴ (ou o microfone) volta.
-  const rotular = () => noCelular && ((encolher.textContent = el.classList.contains("compacta") ? "▴" : "▾"), (encolher.title = el.classList.contains("compacta") ? "Expandir" : "Minimizar e ver a peça"));
-  rotular();
+  // Celular: a IA é a tela principal; — minimiza para um pontinho (a peça fica à vista).
+  if (noCelular) (encolher.textContent = "—"), (encolher.title = "Minimizar (vira um pontinho)");
   encolher.addEventListener("click", () => {
     const compacta = el.classList.toggle("compacta");
-    if (noCelular) return (campo.blur(), rotular());
+    if (noCelular) return campo.blur();
     gravar("haxys.vozCompleta", compacta ? "0" : "1");
   });
   // Sem reconhecimento de fala (celular pelo endereço http antigo): o 🎤 abre o teclado e o ditado dele.
-  const peloTeclado = () => (el.classList.remove("compacta"), rotular(), campo.focus(), escrever("info", "Toque no 🎤 do teclado e fale. Depois toque em Enviar."));
+  const peloTeclado = () => (el.classList.remove("compacta"), campo.focus(), escrever("info", "Toque no 🎤 do teclado e fale. Depois toque em ➤."));
   $(".voz-mic-grande").addEventListener("click", () => (noCelular && !SR ? peloTeclado() : $(".voz-mic").click()));
   if (noCelular) {
-    $(".voz-ajustes").addEventListener("click", () => el.classList.toggle("ajustes"));
-    // 🎤 da tela: já abre o microfone, sem teclado, e encolhe a caixa para a peça ficar à vista.
+    $(".voz-anexar").addEventListener("click", () => $(".voz-imagem").click());
+    // 🎤 da tela: já abre o microfone, sem teclado, e a caixa vira o pontinho (vermelho enquanto ouve).
     $(".voz-teclado").addEventListener("click", () => {
       if (!SR) return peloTeclado();
       $(".voz-mic").click();
-      if (ouvindo) el.classList.add("compacta"), rotular();
+      if (ouvindo) el.classList.add("compacta");
+    });
+    // Pontinho: tocar abre a caixa; arrastar muda de lugar (fica lembrado).
+    const ponto = (x: number, y: number) => {
+      el.style.setProperty("--px", `${Math.max(0, Math.min(x, innerWidth - 44))}px`);
+      el.style.setProperty("--py", `${Math.max(0, Math.min(y, innerHeight - 44))}px`);
+    };
+    try {
+      const p = JSON.parse(ler("haxys.pontoLugar") || "null") as [number, number] | null;
+      if (p) ponto(p[0], p[1]);
+    } catch {
+      /* lugar inválido: fica no canto padrão */
+    }
+    el.addEventListener("pointerdown", (e) => {
+      if (!el.classList.contains("compacta")) return;
+      const r = el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      let arrastou = false;
+      el.setPointerCapture(e.pointerId);
+      const mover = (m: PointerEvent) => {
+        if (!arrastou && Math.hypot(m.clientX - e.clientX, m.clientY - e.clientY) < 8) return;
+        arrastou = true;
+        ponto(m.clientX - dx, m.clientY - dy);
+      };
+      const soltar = (u: PointerEvent) => {
+        el.removeEventListener("pointermove", mover);
+        el.removeEventListener("pointerup", soltar);
+        el.removeEventListener("pointercancel", soltar);
+        const q = el.getBoundingClientRect();
+        if (arrastou) gravar("haxys.pontoLugar", JSON.stringify([Math.round(q.left), Math.round(q.top)]));
+        else if (u.type === "pointerup") el.classList.remove("compacta");
+      };
+      el.addEventListener("pointermove", mover);
+      el.addEventListener("pointerup", soltar);
+      el.addEventListener("pointercancel", soltar);
     });
   }
   // O celular só toca som que começa num toque: a 1ª fala (vazia) sai no 1º toque na caixa.
@@ -224,7 +256,7 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
     return d;
   };
   escrever("info", noCelular
-    ? "Toque no 🎤 e fale a peça que você quer, ou escreva. Ex.: caixa de 30 por 20 por 10 mm com furo de 5 no meio. A IA responde falando. ▾ esconde esta caixa para ver a peça."
+    ? "Toque no 🎤 e fale a peça que você quer, ou escreva. Ex.: caixa de 30 por 20 por 10 mm com furo de 5 no meio. 🖼 manda imagem. A IA responde falando. — vira um pontinho para ver a peça; toque nele para voltar."
     : "Peça do seu jeito: toque no 🎤 microfone e fale, ou digite. A IA usa a sua conta e leva uns 15 a 60 segundos por pedido.");
   tela.textContent = "Toque no microfone e diga o que quer construir.";
   if (!SR) escrever("info", noCelular ? "No celular, toque na caixa de texto e use o microfone do teclado para falar." : "Este navegador não tem reconhecimento de fala: digite as frases (Chrome e Edge têm).");

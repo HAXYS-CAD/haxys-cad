@@ -1,8 +1,11 @@
 # Gerado / instalado (refaz com npm install / npm run build)
 node_modules/
 dist/
-# Senha da ponte MCP: nunca guardar no git
+# Senha da ponte MCP e endereço do túnel: nunca guardar no git
 ponte/segredo.txt
+ponte/URL_PARA_A_IA.txt
+# Ligação do caminho B (nuvem): nunca no git
+nuvem.json
 # Arquivos de saída de testes (3MF, fotos, exportações)
 saida/
 *.log

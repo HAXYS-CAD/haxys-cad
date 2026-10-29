@@ -113,9 +113,9 @@ const CARTOES: Cartao[] = [
 if (noCelular)
   [
     "Na janela 3D: arraste um dedo para girar; com dois dedos, abra ou feche (pinça) para zoom e arraste para mover. O cubo no canto mostra as vistas. Tocar e segurar = botão direito.",
-    "Na aba SÓLIDO, toque em CRIAR → Caixa (ou Cilindro). As faixas de cima rolam para o lado com o dedo. Escreva as medidas e toque em OK. A peça aparece e um passo novo entra na linha do tempo, embaixo.",
+    "No celular quem desenha é a IA: na caixa de baixo, escreva ou toque no 🎤 e diga a peça (ex.: \"caixa de 30 por 20 por 10 mm\"). 🖼 manda uma foto de referência. A peça aparece na tela.",
     "Arquivo → Salvar guarda o projeto na pasta do PC. Arquivo → Exportar gera STL, STEP ou 3MF: o arquivo é baixado no celular (para o Bambu Handy, WhatsApp…) e também fica no PC.",
-    "Abra a caixa da IA (aba SÓLIDO → painel HAXYS → Falar com a IA). Para falar, toque na caixa de texto e use o 🎤 do teclado do celular. Ex.: \"faça uma placa de 60 por 40 com 4 furos de 5 mm\".",
+    "Toque no 🎤 da caixa da IA e fale; a IA responde falando. O — no canto da caixa a transforma num pontinho, para ver a peça inteira. Toque no pontinho para a caixa voltar; arraste para mudar o pontinho de lugar.",
     "Na dúvida, toque no ? da barra de cima e depois toque em qualquer coisa: aparece o que ela faz. Esc (botão no canto) para sair. Este tutorial também fica lá.",
   ].forEach((texto, i) => (CARTOES[i].texto = texto));
 
@@ -171,6 +171,7 @@ export function ligarAjuda() {
   document.querySelector(".botao-ajuda")?.addEventListener("click", ligarModoAjuda);
   document.querySelector(".botao-ajuda")?.addEventListener("contextmenu", (e) => (e.preventDefault(), abrirTutorial()));
   document.querySelector(".botao-ligar-ia")?.addEventListener("click", () => abrirAssistenteIA());
-  if (lembrar("haxys.tutorialVisto") !== "1" && !/[?&]sem-tutorial/.test(location.search))
+  // No celular a tela é limpa (só a IA): o tutorial fala de menus que lá não aparecem.
+  if (!noCelular && lembrar("haxys.tutorialVisto") !== "1" && !/[?&]sem-tutorial/.test(location.search))
     addEventListener("haxys-abertura-fim", () => !tutorial && abrirTutorial(), { once: true });
 }

@@ -277,7 +277,10 @@ const pausa = (ms) => new Promise((ok) => setTimeout(ok, ms));
 async function appNoAr() {
   for (const u of [ENDERECO_APP, "http://127.0.0.1:5173/"]) {
     try {
-      const r = await fetch(u, { signal: AbortSignal.timeout(1500) });
+      // /api/ia só existe no HAXYS CAD: outro programa na 5173 (ex.: painel do JARVIS) não conta.
+      const r = await fetch(`${u}api/ia`, { signal: AbortSignal.timeout(1500) });
+      // Lê a resposta até o fim: resposta não lida de servidor que fecha a conexão derruba o Node 24 (undici).
+      await r.arrayBuffer();
       if (r.ok) return true;
     } catch {
       /* ainda não */
@@ -507,6 +510,7 @@ function servidor() {
 async function pontePronta() {
   try {
     const r = await fetch(`http://127.0.0.1:${PORTA}/saude`, { signal: AbortSignal.timeout(1500) });
+    await r.arrayBuffer();
     return r.ok;
   } catch {
     return false;
@@ -545,8 +549,9 @@ async function modoStdio() {
         for (let i = 0; i < 40 && !(await pontePronta()); i++) await pausa(250);
       }
       const r = await fetch(`http://127.0.0.1:${PORTA}/mcp`, { method: "POST", headers: { "content-type": "application/json" }, body: linha });
+      const texto = (await r.text()).trim();
       if (r.status === 202) return;
-      process.stdout.write((await r.text()).trim() + "\n");
+      process.stdout.write(texto + "\n");
     } catch (e) {
       if (msg?.id !== undefined) process.stdout.write(JSON.stringify({ jsonrpc: "2.0", id: msg.id, error: { code: -32000, message: `Ponte HAXYS fora do ar: ${e.message}` } }) + "\n");
     }

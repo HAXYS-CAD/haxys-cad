@@ -22,10 +22,11 @@ O celular abre o **mesmo HAXYS CAD do seu PC**, com tela de toque. A IA é a tel
 
 ## Usar
 
-- **🎤** fala com a IA. **▾** minimiza a caixa para ver a peça; **▴** volta.
-- **Fotos:** anexe fotos da peça que quer copiar.
-- **Esc** e **＋ Somar** na barra de toque; segurar o dedo = botão direito.
-- Exportar baixa o arquivo no celular e também grava na pasta do PC.
+- A tela é limpa: barra de cima (Arquivo, Salvar, Exportar…), a peça, o cubo de vistas e a caixa da IA.
+- Caixa da IA: **🖼** manda imagem, campo de texto e **🎤** fala com a IA (vira **➤** quando há texto).
+- **—** transforma a caixa num pontinho para ver a peça; toque no pontinho para voltar, arraste para mudar de lugar.
+- Um dedo gira, dois dedos (pinça) dão zoom e movem; segurar o dedo = botão direito.
+- Arquivo → Exportar baixa o arquivo no celular e também grava na pasta do PC.
 
 ## Em breve: sem o PC
 

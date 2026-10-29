@@ -1,5 +1,15 @@
 # Novidades · Changelog
 
+## 0.1.2 — celular mais limpo e ponte mais firme · cleaner mobile, sturdier bridge
+
+- Celular: a tela mostra só a barra de cima (Arquivo, Salvar, Exportar…), a peça e o cubo de vistas. A caixa da IA tem
+  só 🖼 imagem, texto e 🎤 (vira ➤ quando há texto). O — transforma a caixa num pontinho: tocar abre, arrastar muda de lugar.
+- Ponte das IAs: não cai mais quando outro programa usa a porta 5173 e não confunde esse programa com o HAXYS CAD.
+
+**English:** mobile now shows only the top bar, the part and the view cube; the AI box has just image, text and mic
+(send appears when there is text) and minimizes to a small draggable dot. The AI bridge no longer crashes when another
+program answers on port 5173, and no longer mistakes it for HAXYS CAD.
+
 ## 0.1.1 — conserto da ponte das IAs · AI bridge fix
 
 - Com o programa instalado em `C:\Program Files\HAXYS CAD`, a ponte MCP caía ao ligar (não podia gravar a senha ali).
