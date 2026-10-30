@@ -8,8 +8,8 @@ You need: **Windows 10 or 11** (64-bit), about **600 MB** free, and internet onl
 
 ## Option 1: download and click (easiest)
 
-1. Open **[Releases](https://github.com/HAXYS-CAD/haxys-cad/releases/latest)**.
-2. Under **Assets**, click `HAXYS-CAD-Setup-<version>.exe`. The file (about 125 MB) goes to your **Downloads** folder.
+1. Click **[⬇ Download HAXYS CAD](https://github.com/HAXYS-CAD/haxys-cad/releases/latest/download/HAXYS-CAD-Setup.exe)**.
+2. The file `HAXYS-CAD-Setup.exe` (about 125 MB) goes to your **Downloads** folder.
 3. Double-click the file.
 4. Windows may show **"Windows protected your PC"**. That's normal: the installer is free and has no paid digital signature. Click **More info** and then **Run anyway**.
 5. Pick a folder (or keep the suggested one) and click **Next** until the end.

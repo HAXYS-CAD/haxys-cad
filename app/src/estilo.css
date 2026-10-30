@@ -732,3 +732,7 @@ html.celular .controles-tempo button { padding: 6px 7px; font-size: 15px; }
 /* Tela limpa no celular: barra de cima (Arquivo, Salvar, Exportar…), a peça, o cubo de vistas e a IA. */
 html.celular #app { grid-template-rows: 44px 1fr; }
 html.celular :is(.faixa, .linha-do-tempo, .navegador, .barra-navegacao, .info-selecao, .barra-celular) { display: none !important; }
+/* Barra de cima no celular em pé: sem tema, painel de dados e status, para Ligar IA e ? caberem na tela */
+html.celular :is(.escolha-tema, .status-nucleo, .aba-documento, .barra-app > button:first-child) { display: none !important; }
+html.celular .barra-app button { min-width: 34px; }
+html.celular .barra-app .botao-ligar-ia { margin-left: auto; }

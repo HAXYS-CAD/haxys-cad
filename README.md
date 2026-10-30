@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/HAXYS-CAD/haxys-cad/releases/latest"><img src="https://img.shields.io/badge/⬇_Baixar-Windows_10%2F11-d4a94a?style=for-the-badge" alt="Baixar para Windows"></a>
+  <a href="https://github.com/HAXYS-CAD/haxys-cad/releases/latest/download/HAXYS-CAD-Setup.exe"><img src="https://img.shields.io/badge/⬇_Baixar-Windows_10%2F11-d4a94a?style=for-the-badge" alt="Baixar para Windows"></a>
   <a href="docs/pt/celular.md"><img src="https://img.shields.io/badge/📱_Usar-no_celular-30363d?style=for-the-badge" alt="Usar no celular"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/Código-aberto_(MIT)-30363d?style=for-the-badge" alt="Código aberto"></a>
   <img src="https://img.shields.io/badge/Preço-grátis-238636?style=for-the-badge" alt="Grátis">
@@ -63,7 +63,7 @@
 
 <p align="center"><img src="docs/imagens/instalar.png" alt="Os 3 passos da instalação"></p>
 
-1. Abra a página **[Releases](https://github.com/HAXYS-CAD/haxys-cad/releases/latest)** e baixe `HAXYS-CAD-Setup-<versão>.exe`.
+1. Clique em **[⬇ Baixar o HAXYS CAD](https://github.com/HAXYS-CAD/haxys-cad/releases/latest/download/HAXYS-CAD-Setup.exe)**. O instalador (uns 125 MB) vai para a pasta **Downloads**.
 2. Dê dois cliques no arquivo. Se aparecer **"O Windows protegeu o computador"**, clique em **Mais informações** → **Executar assim mesmo** (o instalador é grátis e por isso não tem assinatura paga).
 3. Avance a instalação. O HAXYS CAD abre sozinho e cria um atalho na Área de Trabalho.
 
