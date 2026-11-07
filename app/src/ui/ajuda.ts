@@ -7,6 +7,7 @@
 import { TEXTOS_AJUDA } from "./ajudaTextos";
 import { abrirAssistenteIA, estadoIA } from "./assistenteIA";
 import { noCelular } from "./celular";
+import { naNuvem } from "../nuvem/modo";
 
 const lembrar = (k: string, v?: string) => {
   try {
@@ -153,7 +154,8 @@ export function abrirTutorial(inicio = 0) {
     el.querySelector(".tut-pular")!.addEventListener("click", fechar);
     el.querySelector(".tut-voltar")!.addEventListener("click", () => (i--, void desenhar()));
     el.querySelector(".tut-proximo")!.addEventListener("click", () => (i < CARTOES.length - 1 ? (i++, void desenhar()) : fechar()));
-    if (c.ia) {
+    // Na nuvem a IA já vem ligada (não há "Ligar IA").
+    if (c.ia && !naNuvem) {
       const s = await estadoIA();
       if (!s?.ligada && tutorial === el && CARTOES[i] === c) {
         const caixaIA = el.querySelector<HTMLDivElement>(".tut-ia")!;
@@ -172,6 +174,7 @@ export function ligarAjuda() {
   document.querySelector(".botao-ajuda")?.addEventListener("contextmenu", (e) => (e.preventDefault(), abrirTutorial()));
   document.querySelector(".botao-ligar-ia")?.addEventListener("click", () => abrirAssistenteIA());
   // No celular a tela é limpa (só a IA): o tutorial fala de menus que lá não aparecem.
-  if (!noCelular && lembrar("haxys.tutorialVisto") !== "1" && !/[?&]sem-tutorial/.test(location.search))
+  // Na nuvem quem recebe o convidado são as boas-vindas (nuvem/boasVindas.ts).
+  if (!noCelular && !naNuvem && lembrar("haxys.tutorialVisto") !== "1" && !/[?&]sem-tutorial/.test(location.search))
     addEventListener("haxys-abertura-fim", () => !tutorial && abrirTutorial(), { once: true });
 }

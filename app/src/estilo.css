@@ -345,6 +345,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .menu-arquivo li { display: flex; justify-content: space-between; gap: 16px; padding: 6px 14px; cursor: pointer; }
 .menu-arquivo li:hover { background: var(--hover); }
+.menu-arquivo li[hidden] { display: none; }
 .menu-arquivo em { color: var(--texto-fraco); font-style: normal; }
 .faixa-recuperacao {
   position: fixed; z-index: 70; top: 44px; left: 50%; transform: translateX(-50%);
@@ -542,6 +543,14 @@ input, select, textarea { background: var(--campo); color: var(--texto); border-
 .jp-botoes { gap: 8px; }
 .jp-botoes button.secundario { margin-right: auto; color: var(--texto); background: none; border: 1px solid var(--borda); }
 .jp-botoes button { background: var(--destaque); }
+.senha-admin button.secundario { padding: 4px 14px; color: var(--texto); background: none; border: 1px solid var(--borda); border-radius: 3px; cursor: pointer; }
+/* Salvar e enviar (celular): botões grandes, um embaixo do outro */
+.janela-salvar-enviar { width: min(420px, calc(100vw - 32px)); }
+.janela-salvar-enviar select { padding: 6px; font: inherit; color: var(--texto); background: var(--campo); border: 1px solid var(--borda); border-radius: 3px; }
+.jp-botoes-envio { flex-direction: column; align-items: stretch; }
+.jp-botoes-envio button { padding: 10px 14px; font-size: 16px; }
+.jp-botoes-envio button.secundario { margin-right: 0; }
+.jp-botoes-envio button:disabled { opacity: .5; }
 
 /* Navegador recolhido (seta no título) e tela limpa (botão ⛶ na barra de baixo) */
 .navegador .titulo-flutuante { display: flex; justify-content: space-between; align-items: center; }
@@ -629,6 +638,12 @@ html.celular .botao-celular { display: none; }
 .janela-celular .cel-qr svg { width: 100%; height: auto; }
 .janela-celular ol { margin: 6px 0; padding-left: 20px; line-height: 1.5; }
 .janela-celular a { color: var(--azul); }
+
+/* Boas-vindas do convidado (só na nuvem, nuvem/boasVindas.ts): por cima da caixa da IA. */
+.boas-vindas { width: min(420px, calc(100vw - 32px)); top: 50%; transform: translate(-50%, -50%); z-index: 65; font-size: 16px; }
+.boas-vindas .jp-corpo { padding: 18px; text-align: center; }
+.boas-vindas .bv-ola { font-size: 20px; font-weight: 600; margin-top: 0; }
+.boas-vindas .bv-comecar { margin-top: 10px; min-height: 44px; min-width: 160px; font-size: 16px; background: var(--destaque); color: #fff; border-color: var(--destaque); }
 
 /* ===== HAXYS CAD no celular (html.celular: ver index.html e ui/celular.ts) ===== */
 html.celular body { font-size: 14px; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }

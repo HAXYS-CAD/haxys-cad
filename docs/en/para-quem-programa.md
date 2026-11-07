@@ -51,6 +51,10 @@ npm run instalador   # builds instalador\HAXYS-CAD-Setup-<version>.exe
 - `HAXYS_PORTA_CELULAR`: phone port (default 5174).
 - `HAXYS_PONTE`: bridge path used by the Claude Desktop extension.
 
+## For AI agents
+
+Rules and canonical commands in [AGENTS.md](../../AGENTS.md).
+
 ## Contributing
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md). Code and UI text are in Brazilian Portuguese.

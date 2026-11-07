@@ -289,6 +289,7 @@ export function comandoConstruir(raiz: HTMLElement, projeto: Projeto, selecao: S
     return { ...base, tipo: "ponto", params: {}, pontoConstrucao: r.ponto! };
   };
   // A janela chama aoMudar já ao abrir, antes de "dialogo" existir: por isso o "?.".
+  // eslint-disable-next-line prefer-const -- a janela usa "dialogo" antes de abrirDialogo devolver; com const daria erro
   let dialogo: Dialogo | undefined;
   const atualizar = () => {
     try {

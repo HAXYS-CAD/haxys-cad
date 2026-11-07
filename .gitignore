@@ -24,3 +24,12 @@ celular-certificado.json
 
 # Termos pessoais da varredura do publicar.mjs: nunca no git
 ferramentas/termos-privados.txt
+
+# Caminho B (nuvem): gerados, instalados e segredos locais do wrangler
+nuvem/node_modules/
+nuvem/.wrangler/
+nuvem/.dev.vars
+app/dist-nuvem/
+
+# Gráfico do Graphify (gerado; refaz com graphify update)
+graphify-out/

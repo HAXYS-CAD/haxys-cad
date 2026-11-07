@@ -619,7 +619,7 @@ export function criarModoEsboco(vista: Vista, sobreposicao: HTMLElement, acoes: 
     if (!dados || etapa !== "desenhando") return;
     const ocupados = new Map<string, number>(); // símbolos no mesmo lugar ficam lado a lado
     for (const el of rotulos.children as HTMLCollectionOf<HTMLElement>) {
-      let w: THREE.Vector3 | null = null;
+      let w: THREE.Vector3 | null;
       if (el.dataset.cota) {
         const c = dados.cotas.find((x) => x.id === Number(el.dataset.cota));
         w = c ? posicaoRotulo(c) : null;
@@ -936,7 +936,7 @@ export function criarModoEsboco(vista: Vista, sobreposicao: HTMLElement, acoes: 
         }
       }
     }
-    let polilinhas: V3[][] = escolhida ? [escolhida] : [];
+    const polilinhas: V3[][] = escolhida ? [escolhida] : [];
     if (!escolhida) {
       raioDoMouse(x, y);
       const acerto = raio.intersectObjects(malhas, false)[0];

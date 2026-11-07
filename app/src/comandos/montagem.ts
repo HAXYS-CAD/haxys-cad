@@ -129,6 +129,7 @@ export function comandoJunta(raiz: HTMLElement, projeto: Projeto, selecao: Selec
     selecao.limpar();
   };
   let dialogo: Dialogo | undefined;
+  // eslint-disable-next-line prefer-const -- a janela usa "dialogo" antes de abrirDialogo devolver; com const daria erro
   dialogo = abrirDialogo(raiz, {
     titulo: existente ? `Editar ${nome}` : comoEsta ? "Junta como está" : "Junta",
     campos: [

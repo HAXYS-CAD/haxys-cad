@@ -51,6 +51,10 @@ npm run instalador   # gera instalador\HAXYS-CAD-Setup-<versão>.exe
 - `HAXYS_PORTA_CELULAR`: porta do celular (padrão 5174).
 - `HAXYS_PONTE`: caminho da ponte usado pela extensão do Claude Desktop.
 
+## Para agentes de IA
+
+Regras e comandos canônicos em [AGENTS.md](../../AGENTS.md).
+
 ## Contribuir
 
 Veja [CONTRIBUTING.md](../../CONTRIBUTING.md).

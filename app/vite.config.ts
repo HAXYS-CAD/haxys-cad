@@ -1,4 +1,7 @@
 import { defineConfig, type Connect, type Plugin } from "vite";
+// Instruções do pedido de IA: comuns com a ponte e a nuvem.
+import { montarPedido } from "../ponte/ferramentas.mjs";
+import { CABECALHO, ENDERECO_NUVEM, destinoDaPeca, extrairCodigo, nomeSeguro } from "../nuvem/logica.mjs";
 import { spawn } from "node:child_process";
 import { randomBytes, X509Certificate } from "node:crypto";
 import { createServer } from "node:http";
@@ -192,32 +195,6 @@ const CLAUDE = (() => {
   return existsSync(local) ? local : "";
 })();
 
-const INSTRUCOES = `Você é o assistente do painel de voz do HAXYS CAD (CAD 3D parecido com o Autodesk Fusion).
-Use só as ferramentas do servidor haxys (construir, estado_do_projeto, ver_tela) para olhar e mudar a peça.
-Antes de mudar uma peça que já existe, veja o estado_do_projeto. Não apague nada sem a pessoa pedir.
-A resposta final vai ser lida em voz alta: responda em português do Brasil, em 1 a 3 frases curtas, com os números importantes (medidas, volume).`;
-
-// Pedido "Replicar peça da foto": a IA estuda as fotos (com o marcador HAXYS de
-// 40 mm e a régua, se houver), pesquisa a peça na internet, constrói, confere e
-// vê se cabe na impressora; se não couber, corta com encaixes.
-const INSTRUCOES_REPLICA = `MODO REPLICAR PEÇA DA FOTO. Objetivo: replicar a peça das fotos com a maior precisão possível.
-1. Estude todas as fotos anexadas. Medidas: se houver o marcador HAXYS (quadrado preto de 40 mm com quadrado branco de 20 mm no meio)
-   ou a régua de 150 mm, use-os como escala (meça em pixels e converta). As medidas que a pessoa informou valem mais que as estimadas.
-   Se a folha de referência inteira aparecer, confira a impressão: a folha A4 tem 210 mm de largura; se pela régua/marcador ela der
-   outra largura, a impressão saiu encolhida: use a largura da folha (210 mm) como escala e avise a pessoa.
-   A escala da folha só vale na altura do papel: partes altas da peça parecem maiores (mais perto da câmera).
-   Paquímetro ou régua nas fotos: leia as medidas neles (escala principal + nônio) e prefira essas às da folha.
-   Não copie medidas do projeto que já está aberto: ele pode ser outra peça. Sem nenhuma escala na foto, estime pelo
-   tipo de peça (pesquisa de medidas padrão) e diga que é estimativa.
-2. Pesquise na internet a peça (nome, uso, medidas padrão, normas, rosca, encaixes) para completar o que a foto não mostra.
-3. Construa com a ferramenta construir (novo_projeto primeiro), em partes lógicas: base, furos, detalhes, arredondamentos.
-4. Confira com ver_tela e estado_do_projeto, compare com a foto e corrija.
-5. Rode verificar_impressao. Se não couber na impressora da pessoa, use corte_encaixes (pinos ou cavilhas) até caber e confira de novo.
-   Encaixe imprimível: diâmetro do pino ≈ metade da espessura da peça no corte (mínimo 2 mm), comprimento ≈ 2 a 3 × o diâmetro,
-   folga 0,2 mm; corte longe de furos. Se a peça tiver menos de 4 mm de espessura no corte, avise que o encaixe fica fraco.
-6. Na resposta: diga as medidas principais que você usou e de onde vieram (marcador, informado, pesquisa ou estimado), se cabe
-   inteira ou em quantas partes, e faça UMA pergunta curta sobre o que ajustar ou confirmar.`;
-
 function rodar(exe: string, args: string[], cwd: string, limiteMs: number): Promise<{ codigo: number; saida: string }> {
   return new Promise((ok) => {
     const p = spawn(exe, args, { cwd, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
@@ -289,7 +266,7 @@ async function conversarComChave(c: Ligacao, pedido: string, imagens: { tipo: st
         signal: AbortSignal.timeout(240000),
       });
     } catch (e) {
-      throw new Error(/localhost|127\.0\.0\.1/.test(c.base!) ? "A IA deste PC (Ollama / LM Studio) não respondeu: abra o programa dela e tente de novo." : `Sem ligação com a empresa da IA: ${e instanceof Error ? e.message : e}`);
+      throw new Error(/localhost|127\.0\.0\.1/.test(c.base!) ? "A IA deste PC (Ollama / LM Studio) não respondeu: abra o programa dela e tente de novo." : `Sem ligação com a empresa da IA: ${e instanceof Error ? e.message : e}`, { cause: e });
     }
     const j = await r.json().catch(() => null);
     if (!r.ok) throw new Error(erroDaEmpresa(r.status, j));
@@ -357,7 +334,7 @@ function servicoIA(): Plugin {
       const texto = String(p.texto ?? "").slice(0, 4000).trim();
       if (!texto) return responder(400, { erro: "Pedido vazio" });
       const conversa = String(p.conversa ?? "").slice(-6000);
-      const pedido = `${INSTRUCOES}\n${p.replica ? `\n${INSTRUCOES_REPLICA}\n` : ""}${conversa ? `\nConversa recente:\n${conversa}\n` : ""}\nPedido da pessoa: ${texto}`;
+      const pedido = montarPedido({ texto, conversa, replica: p.replica });
       const pasta = join(PASTA_SAIDA, ".ia");
       mkdirSync(pasta, { recursive: true });
       if (p.ia === "chave") {
@@ -433,7 +410,7 @@ function servicoIA(): Plugin {
 // Só aceita pedidos deste computador E da própria página do HAXYS CAD (outro
 // site aberto no navegador não consegue gravar nada).
 const PASTA_PROJETOS = join(PASTA_DADOS, "projetos");
-const nomeSeguro = (n: string) => decodeURIComponent(n).replace(/[^\p{L}\p{N} _-]/gu, "_").trim().slice(0, 80);
+// nomeSeguro: a mesma regra do celular e da nuvem (nuvem/logica.mjs).
 
 function servicoArquivos(): Plugin {
   const tratar: Connect.NextHandleFunction = async (req, res) => {
@@ -532,6 +509,7 @@ function servicoArquivos(): Plugin {
 // saida/fusion_trazer.json (linha do tempo + malha de cada operação) e a
 // resposta é esse arquivo. Igual ao ferramentas/fusion_mcp.py, em Node.
 // Texto Python só com ASCII (o Fusion estraga letras como "Ã" escritas no script).
+// eslint-disable-next-line no-control-regex -- de propósito: troca todo caractere fora do ASCII
 const textoPython = (s: string) => JSON.stringify(s).replace(/[^\x00-\x7f]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 function servicoFusion(): Plugin {
   const MCP = "http://127.0.0.1:27185/mcp";
@@ -629,8 +607,10 @@ function servicoCelular(): Plugin {
         res.writeHead(302, { "set-cookie": `haxys_celular=${segredo}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Strict`, location: "/" });
         return res.end();
       }
+      // O iPhone busca o ícone da tela de início sem o cookie: sem isso, vira um "H" em fundo preto.
+      const publico = req.method === "GET" && (url.pathname === "/icone.png" || url.pathname === "/manifest.webmanifest");
       const cookie = /(?:^|;\s*)haxys_celular=([0-9a-f]+)/.exec(String(req.headers.cookie ?? ""))?.[1];
-      if (cookie !== segredo) {
+      if (cookie !== segredo && !publico) {
         res.writeHead(403, { "content-type": "text/html; charset=utf-8" });
         return res.end(`<!doctype html><meta name="viewport" content="width=device-width"><body style="font:18px sans-serif;padding:24px;background:#1c2128;color:#eee"><h2>HAXYS CAD</h2><p>Este celular ainda não está ligado ao HAXYS CAD do PC.</p><p>No PC, toque no botão <b>📱</b> (barra de cima) e leia o QR code com a câmera do celular.</p>`);
       }
@@ -653,7 +633,7 @@ function servicoCelular(): Plugin {
           return res.end();
         }
       }
-      (req as { celular?: boolean }).celular = true;
+      (req as { celular?: boolean }).celular = cookie === segredo;
       app(req, res);
     });
     // Endereço antigo (http, ícone já salvo no celular): manda para o https na mesma porta.
@@ -687,12 +667,165 @@ function servicoCelular(): Plugin {
   return { name: "haxys-celular", configureServer: (s) => montar(s.middlewares), configurePreviewServer: (s) => montar(s.middlewares) };
 }
 
+// Peças salvas no celular (caminho B) chegam sozinhas em projetos/. Só depois de "Ligar ao meu celular":
+// sem código em nuvem.json não há nenhuma chamada para fora. nuvem.json fica na pasta de dados (fora do git).
+// GET  /api/nuvem-pc        → { ligado, admin, novas, recebidas }
+// POST /api/nuvem-pc/ligar  { texto } → guarda o código do convite e sincroniza
+// POST /api/nuvem-pc/vistas → zera "novas"
+// Só o dono (senha de administrador, guardada em nuvem.json depois de conferida na nuvem):
+// POST /api/nuvem-pc/admin { senha }; GET|POST /api/nuvem-pc/convites… → /api/convites… da nuvem.
+// Sincroniza ao ligar o servidor e a cada 5 min. Peça mexida no PC nunca é sobrescrita (destinoDaPeca).
+interface Recebida { salvoEm: string; mtime: number; arquivo: string }
+interface ConfigNuvem { endereco?: string; codigo?: string; senhaAdmin?: string; recebidas: Record<string, Recebida>; novas: string[] }
+const ARQ_NUVEM = join(PASTA_DADOS, "nuvem.json");
+function lerNuvem(): ConfigNuvem {
+  try {
+    const c = JSON.parse(readFileSync(ARQ_NUVEM, "utf8"));
+    return { ...c, recebidas: c.recebidas ?? {}, novas: c.novas ?? [] };
+  } catch {
+    return { recebidas: {}, novas: [] };
+  }
+}
+const gravarNuvem = (c: ConfigNuvem) => writeFileSync(ARQ_NUVEM, JSON.stringify(c, null, 2));
+const enderecoNuvem = (c: ConfigNuvem) => (process.env.HAXYS_NUVEM ?? c.endereco ?? ENDERECO_NUVEM).replace(/\/+$/, "");
+
+function servicoNuvem(): Plugin {
+  let rodando: Promise<boolean> | null = null;
+  // true = falou com a nuvem; false = sem internet ou convite recusado (tenta de novo depois, sem aviso).
+  const sincronizar = () => (rodando ??= sincronizarJa().catch(() => false).finally(() => (rodando = null)));
+  async function sincronizarJa(): Promise<boolean> {
+    const c = lerNuvem();
+    if (!c.codigo) return false;
+    const base = enderecoNuvem(c);
+    const pedir = (caminho: string) => fetch(`${base}/api/nuvem/pecas${caminho}`, { headers: { [CABECALHO]: c.codigo! }, signal: AbortSignal.timeout(30000) });
+    const r = await pedir("");
+    if (!r.ok) return (await r.arrayBuffer(), false);
+    const { pecas } = (await r.json()) as { pecas: { nome: string; salvoEm: string }[] };
+    mkdirSync(PASTA_PROJETOS, { recursive: true });
+    for (const p of pecas) {
+      const nome = nomeSeguro(encodeURIComponent(p.nome));
+      if (!nome) continue;
+      const arquivoLocal = join(PASTA_PROJETOS, `${nome}.haxys`);
+      const local = existsSync(arquivoLocal) ? { existe: true, mtime: statSync(arquivoLocal).mtimeMs } : { existe: false };
+      const d = destinoDaPeca({ nome, salvoEm: p.salvoEm }, local, c.recebidas[nome]);
+      if (d.acao === "ignorar") continue;
+      const rt = await pedir(`/${encodeURIComponent(nome)}`);
+      if (!rt.ok) {
+        await rt.arrayBuffer();
+        continue;
+      }
+      const texto = await rt.text();
+      try {
+        if (JSON.parse(texto).formato !== "haxys-cad") continue;
+      } catch {
+        continue;
+      }
+      // Cópia "- do celular" com o mesmo nome já no PC (duas no mesmo minuto): numera, nunca sobrescreve.
+      let arquivo = d.arquivo;
+      for (let i = 2; arquivo !== nome && existsSync(join(PASTA_PROJETOS, `${arquivo}.haxys`)); i++) arquivo = `${d.arquivo.slice(0, 76)} ${i}`;
+      const destino = join(PASTA_PROJETOS, `${arquivo}.haxys`);
+      writeFileSync(destino, texto);
+      // Imagem para a janela Abrir (como o /api/projetos/<nome>/imagem); sem imagem não atrapalha.
+      const ri = await pedir(`/${encodeURIComponent(nome)}/imagem`).catch(() => null);
+      const png = ri?.ok ? Buffer.from(await ri.arrayBuffer()) : (await ri?.arrayBuffer(), null);
+      if (png && png.subarray(0, 8).toString("hex") === "89504e470d0a1a0a") {
+        mkdirSync(join(PASTA_PROJETOS, ".miniaturas"), { recursive: true });
+        writeFileSync(join(PASTA_PROJETOS, ".miniaturas", `${arquivo}.png`), png);
+      }
+      // Relê o nuvem.json: a página pode ter zerado as "novas" no meio.
+      const atual = lerNuvem();
+      atual.recebidas[nome] = { salvoEm: p.salvoEm, mtime: statSync(destino).mtimeMs, arquivo };
+      if (!atual.novas.includes(arquivo)) atual.novas.push(arquivo);
+      gravarNuvem(atual);
+    }
+    return true;
+  }
+  const montar = (app: Connect.Server) => {
+    void sincronizar();
+    setInterval(() => void sincronizar(), 5 * 60 * 1000).unref();
+    app.use("/api/nuvem-pc", async (req, res) => {
+      const responder = (codigo: number, dados: unknown) => {
+        res.statusCode = codigo;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.end(JSON.stringify(dados));
+      };
+      // Só a página do próprio PC (o celular da rede de casa e outros sites não).
+      const host = String(req.headers.host ?? "");
+      if (doCelular(req) || !doPc(req) || !origemOk(req) || !/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)) return responder(403, { erro: "Só neste computador" });
+      try {
+        const caminho = new URL(req.url ?? "/", "http://x").pathname;
+        const estado = () => {
+          const c = lerNuvem();
+          return { ligado: !!c.codigo, admin: !!c.senhaAdmin, novas: c.novas, recebidas: [...new Set(Object.values(c.recebidas).map((r) => r.arquivo))] };
+        };
+        if (req.method === "GET" && caminho === "/") return responder(200, estado());
+        if (req.method === "POST" && caminho === "/ligar") {
+          const { texto } = JSON.parse((await lerCorpo(req, 10000)).toString("utf8") || "{}");
+          const codigo = extrairCodigo(String(texto ?? ""));
+          if (!codigo) return responder(400, { erro: "Esse link não é um convite do HAXYS CAD." });
+          gravarNuvem({ ...lerNuvem(), codigo });
+          const sincronizou = await sincronizar();
+          return responder(200, { ...estado(), sincronizou });
+        }
+        if (req.method === "POST" && caminho === "/vistas") {
+          gravarNuvem({ ...lerNuvem(), novas: [] });
+          return responder(200, estado());
+        }
+        // Convites: repassa para a nuvem com a senha (a senha nunca volta para a página).
+        const convites = (sub: string, senha: string, init: RequestInit = {}) =>
+          fetch(`${enderecoNuvem(lerNuvem())}/api/convites${sub}`, { ...init, headers: { ...init.headers, Authorization: `Bearer ${senha}` }, signal: AbortSignal.timeout(30000) });
+        if (req.method === "POST" && caminho === "/admin") {
+          const { senha } = JSON.parse((await lerCorpo(req, 10000)).toString("utf8") || "{}");
+          if (typeof senha !== "string" || !senha) return responder(400, { erro: "Digite a senha." });
+          const r = await convites("", senha).catch(() => null);
+          await r?.arrayBuffer();
+          if (!r) return responder(502, { erro: "A nuvem não respondeu. Tente de novo." });
+          if (r.status === 401) return responder(400, { erro: "Senha de administrador errada." });
+          if (!r.ok) return responder(502, { erro: `A nuvem respondeu ${r.status}.` });
+          gravarNuvem({ ...lerNuvem(), senhaAdmin: senha });
+          return responder(200, estado());
+        }
+        if (/^\/convites(\/[A-Za-z0-9_-]{22}\/(bloquear|desbloquear))?$/.test(caminho) && (req.method === "GET" || req.method === "POST")) {
+          const senha = lerNuvem().senhaAdmin;
+          if (!senha) return responder(403, { erro: "Só o administrador." });
+          const corpo = req.method === "POST" ? await lerCorpo(req, 10000) : undefined;
+          const r = await convites(caminho.slice("/convites".length), senha, { method: req.method, headers: { "content-type": "application/json" }, body: corpo }).catch(() => null);
+          if (!r) return responder(502, { erro: "A nuvem não respondeu. Tente de novo." });
+          res.statusCode = r.status;
+          res.setHeader("Content-Type", "application/json; charset=utf-8");
+          return res.end(Buffer.from(await r.arrayBuffer()));
+        }
+        responder(404, { erro: "Não existe" });
+      } catch (e) {
+        responder(500, { erro: e instanceof Error ? e.message : String(e) });
+      }
+    });
+  };
+  return { name: "haxys-nuvem", configureServer: (s) => montar(s.middlewares), configurePreviewServer: (s) => montar(s.middlewares) };
+}
+
+// Só no build da nuvem: sw-lista.json com os arquivos de assets/ (JS, CSS, WASM). O service worker
+// (public/sw.js) guarda todos ao instalar, para abrir sem internet já depois da 1ª visita.
+function listaDoServiceWorker(): Plugin {
+  return {
+    name: "haxys-sw-lista",
+    apply: (_c, { command, mode }) => command === "build" && mode === "nuvem",
+    generateBundle(_o, bundle) {
+      const arquivos = Object.keys(bundle).filter((f) => f.startsWith("assets/"));
+      this.emitFile({ type: "asset", fileName: "sw-lista.json", source: JSON.stringify(arquivos) });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [servicoBambu(), servicoIA(), servicoArquivos(), servicoFusion(), servicoCelular()],
+  plugins: [servicoBambu(), servicoIA(), servicoArquivos(), servicoFusion(), servicoCelular(), servicoNuvem(), listaDoServiceWorker()],
   // O worker do núcleo usa import moderno (ES modules).
   worker: { format: "es" },
   // O OpenCascade carrega o próprio .wasm; não deixar o Vite reempacotar.
   optimizeDeps: { exclude: ["replicad-opencascadejs"] },
+  // A página importa ../ponte/ferramentas.mjs e ../nuvem/logica.mjs. Só esses arquivos de fora do app: a pasta
+  // HAXYS_CAD tem ia.json, ponte/segredo.txt e celular.txt, que o servidor de desenvolvimento não pode servir.
+  server: { fs: { allow: [".", "../ponte/ferramentas.mjs", "../nuvem/logica.mjs"] } },
   // Duas páginas: o programa e o "Ligar a IA" do primeiro uso (escolhido no instalador).
   build: { rollupOptions: { input: { main: resolve(dirname(fileURLToPath(import.meta.url)), "index.html"), ligarIA: resolve(dirname(fileURLToPath(import.meta.url)), "ligar-ia.html") } } },
 });

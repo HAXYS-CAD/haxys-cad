@@ -3,6 +3,9 @@
 // Projetos: HAXYS_CAD/projetos (/api/projetos). Exportações: HAXYS_CAD/saida (/api/exportar).
 // "Outro arquivo do computador": janela de escolher arquivo (só leitura).
 import { EXTENSAO } from "./formato";
+// Na nuvem (caminho B) não há servidor do PC: cada função repassa para nuvem/discoNuvem.ts.
+import { naNuvem } from "../nuvem/modo";
+import * as nuvem from "../nuvem/discoNuvem";
 
 function nomeSemExtensao(nome: string) {
   return nome.endsWith(EXTENSAO) ? nome.slice(0, -EXTENSAO.length) : nome;
@@ -10,6 +13,7 @@ function nomeSemExtensao(nome: string) {
 
 // Grava a exportação (stl, step, 3mf) em HAXYS_CAD/saida; devolve o caminho completo.
 export async function gravarExportacao(dados: ArrayBuffer, nome: string, extensao: string): Promise<string> {
+  if (naNuvem) return nuvem.gravarExportacao(dados, nome, extensao);
   const { arquivo } = await pedir<{ arquivo: string }>(`/api/exportar/${encodeURIComponent(nome + extensao)}`, { method: "POST", body: dados });
   return arquivo;
 }
@@ -27,14 +31,16 @@ async function pedir<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 // Imagem do projeto (projetos/.miniaturas). "versao" evita mostrar a imagem antiga.
-export const urlImagemProjeto = (nome: string, versao = "") => `/api/projetos/${encodeURIComponent(nome)}/imagem?v=${encodeURIComponent(versao)}`;
+export const urlImagemProjeto = (nome: string, versao = "") => naNuvem ? nuvem.urlImagemProjeto(nome, versao) : `/api/projetos/${encodeURIComponent(nome)}/imagem?v=${encodeURIComponent(versao)}`;
 export async function gravarImagemProjeto(nome: string, png: Blob) {
+  if (naNuvem) return nuvem.gravarImagemProjeto(nome, png);
   await pedir(`/api/projetos/${encodeURIComponent(nome)}/imagem`, { method: "POST", body: png });
 }
 
-export const listarProjetos =() => pedir<{ pasta: string; projetos: ProjetoNaPasta[] }>("/api/projetos");
+export const listarProjetos = () => naNuvem ? nuvem.listarProjetos() : pedir<{ pasta: string; projetos: ProjetoNaPasta[] }>("/api/projetos");
 
 export async function lerDaPasta(nome: string): Promise<string> {
+  if (naNuvem) return nuvem.lerDaPasta(nome);
   const r = await fetch(`/api/projetos/${encodeURIComponent(nome)}`);
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).erro ?? `o projeto "${nome}" não abriu`);
   return r.text();
@@ -42,6 +48,7 @@ export async function lerDaPasta(nome: string): Promise<string> {
 
 // Grava em HAXYS_CAD/projetos; devolve o caminho e o nome final (o servidor troca caracteres proibidos).
 export async function gravarNaPasta(nome: string, texto: string): Promise<{ arquivo: string; nome: string }> {
+  if (naNuvem) return nuvem.gravarNaPasta(nome, texto);
   const { arquivo } = await pedir<{ arquivo: string }>(`/api/projetos/${encodeURIComponent(nome)}`, {
     method: "POST",
     headers: { "content-type": "application/json" },

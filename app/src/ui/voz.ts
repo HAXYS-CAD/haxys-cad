@@ -17,6 +17,9 @@ import { executarScript } from "./consoleScript";
 import { preferencias } from "../comandos/bambu";
 import { abrirAssistenteIA, estadoIA } from "./assistenteIA";
 import { noCelular } from "./celular";
+import { naNuvem } from "../nuvem/modo";
+import { conversarNaNuvem, type Atender } from "../nuvem/iaNuvem";
+import { montarPedido } from "../../../ponte/ferramentas.mjs";
 
 interface Reconhecedor {
   lang: string;
@@ -83,12 +86,16 @@ export function replicarComFotos(projeto: Projeto, avisar: (t: string) => void, 
   if (!el) return;
   el.classList.remove("compacta");
   const modo = el.querySelector<HTMLSelectElement>(".voz-modo")!;
-  if (modo.value !== "codex") (modo.value = "codex"), modo.dispatchEvent(new Event("change"));
+  if (!naNuvem && modo.value !== "codex") (modo.value = "codex"), modo.dispatchEvent(new Event("change"));
   if (el.querySelector<HTMLElement>(".voz-form-replica")!.hidden) el.querySelector<HTMLElement>(".voz-replicar")!.click();
   void el.anexar(arqs);
 }
 
-export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
+// Ações da tela para a IA da nuvem (ligarPonte devolve); fica guardado para as aberturas seguintes.
+let atenderNuvem: Atender | undefined;
+
+export function abrirVoz(projeto: Projeto, avisar: (t: string) => void, atender?: Atender) {
+  if (atender) atenderNuvem = atender;
   if (aberto) return;
   const SR = !isSecureContext ? undefined : (window as unknown as { SpeechRecognition?: new () => Reconhecedor; webkitSpeechRecognition?: new () => Reconhecedor }).SpeechRecognition ??
     (window as unknown as { webkitSpeechRecognition?: new () => Reconhecedor }).webkitSpeechRecognition;
@@ -139,7 +146,9 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
   const campo = $<HTMLInputElement>(".voz-texto");
   const modo = $<HTMLSelectElement>(".voz-modo");
   modo.value = ["chave", "codex", "claude", "local"].includes(ler("haxys.vozModo")) ? ler("haxys.vozModo") : "codex";
-  const comFotos = () => modo.value === "codex" || modo.value === "chave";
+  // Na nuvem a IA é uma só (a do convite): sem escolha de IA nem "Ligar IA"; fotos e Replicar ficam.
+  if (naNuvem) (modo.value = "chave"), (modo.closest("label")!.style.display = "none");
+  const comFotos = () => naNuvem || modo.value === "codex" || modo.value === "chave";
   const mostrarModo = () => el.querySelectorAll<HTMLElement>(".voz-so-codex").forEach((x) => (x.hidden = !comFotos()));
   $(".voz-ligar").addEventListener("click", () => abrirAssistenteIA());
   // O assistente ligou uma IA: a caixa passa a usar ela.
@@ -257,10 +266,13 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
   };
   escrever("info", noCelular
     ? "Toque no 🎤 e fale a peça que você quer, ou escreva. Ex.: caixa de 30 por 20 por 10 mm com furo de 5 no meio. 🖼 manda imagem. A IA responde falando. — vira um pontinho para ver a peça; toque nele para voltar."
-    : "Peça do seu jeito: toque no 🎤 microfone e fale, ou digite. A IA usa a sua conta e leva uns 15 a 60 segundos por pedido.");
+    : naNuvem
+      ? "Peça do seu jeito: toque no 🎤 microfone e fale, ou digite. A IA leva uns 15 a 60 segundos por pedido."
+      : "Peça do seu jeito: toque no 🎤 microfone e fale, ou digite. A IA usa a sua conta e leva uns 15 a 60 segundos por pedido.");
   tela.textContent = "Toque no microfone e diga o que quer construir.";
   if (!SR) escrever("info", noCelular ? "No celular, toque na caixa de texto e use o microfone do teclado para falar." : "Este navegador não tem reconhecimento de fala: digite as frases (Chrome e Edge têm).");
-  void estadoIA().then((j) => {
+  // Na nuvem não há serviço local nem IA para ligar: a IA da nuvem já está pronta.
+  if (!naNuvem) void estadoIA().then((j) => {
     if (!j) return escrever("erro", "Sem o serviço local (abra o HAXYS CAD pelo atalho ou pelo INICIAR.bat): só o modo Comandos funciona.");
     // Sem escolha guardada nesta tela: usa a IA ligada no assistente.
     if (!ler("haxys.vozModo") && j.ligada) (modo.value = j.ligada), mostrarModo();
@@ -334,25 +346,53 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
       }),
     );
   };
+  // Abre qualquer foto: createImageBitmap e, se falhar (HEIC, por exemplo), pelo <img> (o Safari abre HEIC assim).
+  const abrirFoto = async (f: Blob): Promise<ImageBitmap | HTMLImageElement> => {
+    try {
+      return await createImageBitmap(f);
+    } catch {
+      const img = new Image();
+      const url = URL.createObjectURL(f);
+      try {
+        img.src = url;
+        await img.decode();
+        return img;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+  };
   // Foto de celular é grande: reduz para 2.400 px no lado maior (JPEG), o que
-  // ainda deixa ler o paquímetro e mantém 30 fotos dentro do limite do /api/ia.
-  const reduzir = async (f: File) => {
-    const bmp = await createImageBitmap(f);
-    const k = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
+  // ainda deixa ler o paquímetro. Qualquer tamanho de foto entra (sem recusa).
+  const reduzir = async (f: Blob, lado = 2400, qualidade = 0.9) => {
+    const im = await abrirFoto(f);
+    const k = Math.min(1, lado / Math.max(im.width, im.height));
     const c = document.createElement("canvas");
-    c.width = Math.round(bmp.width * k);
-    c.height = Math.round(bmp.height * k);
-    c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
-    bmp.close();
-    const url = c.toDataURL("image/jpeg", 0.9);
+    c.width = Math.round(im.width * k);
+    c.height = Math.round(im.height * k);
+    c.getContext("2d")!.drawImage(im, 0, 0, c.width, c.height);
+    if ("close" in im) im.close();
+    const url = c.toDataURL("image/jpeg", qualidade);
     return url.slice(url.indexOf(",") + 1);
+  };
+  // Soma das fotos de um pedido: na nuvem e na "Minha IA" (Gemini e outras: ~20 MB por pedido) até 14 MB;
+  // no Codex até 60 MB (o /api/ia aceita 80 MB). Passou: diminui todas mais um pouco, até caber. Nunca recusa.
+  const caberNoPedido = async (imagens: { tipo: string; base64: string }[]) => {
+    const limite = (naNuvem || modo.value === "chave" ? 14 : 60) * 1024 * 1024;
+    const soma = () => imagens.reduce((s, im) => s + im.base64.length, 0);
+    for (let lado = 1800; soma() > limite && lado >= 300; lado = Math.round(lado * 0.75)) {
+      imagens = await Promise.all(
+        imagens.map(async (im) => ({ tipo: "image/jpeg", base64: await reduzir(await (await fetch(`data:${im.tipo};base64,${im.base64}`)).blob(), lado, 0.85) })),
+      );
+    }
+    return imagens;
   };
   let chegando = 0;
   const anexar = async (arqs: Iterable<File>) => {
     for (const f of arqs) {
       if (fotos.length + chegando >= MAX_FOTOS) return escrever("erro", `No máximo ${MAX_FOTOS} fotos.`);
-      if (!f.type.startsWith("image/")) { escrever("erro", `${f.name}: não é foto.`); continue; }
-      if (f.size > 40 * 1024 * 1024) { escrever("erro", `${f.name}: grande demais (até 40 MB).`); continue; }
+      // HEIC do iPhone às vezes chega sem tipo: vale pela extensão.
+      if (!f.type.startsWith("image/") && !/\.(heic|heif)$/i.test(f.name)) { escrever("erro", `${f.name}: não é foto.`); continue; }
       chegando++;
       try {
         fotos.push({ tipo: "image/jpeg", base64: await reduzir(f), nome: f.name });
@@ -414,7 +454,13 @@ export function abrirVoz(projeto: Projeto, avisar: (t: string) => void) {
   const trocas: string[] = []; // "Pessoa: ..." / "IA: ..." (as últimas vão para a IA)
   let ocupado = false;
   async function pedirAIA(frase: string, replica: boolean): Promise<string> {
-    const imagens = comFotos() ? fotos.map(({ tipo, base64 }) => ({ tipo, base64 })) : [];
+    const imagens = comFotos() ? await caberNoPedido(fotos.map(({ tipo, base64 }) => ({ tipo, base64 }))) : [];
+    if (naNuvem) {
+      if (!atenderNuvem) throw new Error("A tela ainda não está pronta. Tente de novo.");
+      // Mesmos cortes do /api/ia do PC (vite.config.ts).
+      const pedido = montarPedido({ texto: frase.slice(0, 4000), conversa: trocas.slice(-8).join("\n").slice(-6000), replica });
+      return conversarNaNuvem(pedido, imagens.slice(0, MAX_FOTOS), atenderNuvem, (t) => escrever("info", t));
+    }
     const r = await fetch("/api/ia", {
       method: "POST",
       headers: { "content-type": "application/json" },

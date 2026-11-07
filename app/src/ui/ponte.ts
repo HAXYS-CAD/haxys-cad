@@ -16,6 +16,11 @@ import { APARENCIAS, MATERIAIS } from "../nucleo/materiais";
 import { mesaEscolhida } from "../comandos/bambu";
 import { enviarAoLaser, svgDoLaser } from "../comandos/laser";
 import { comandoPosicao, definirContato, duplicarComJuntas, moverJunta } from "../comandos/montagem";
+import { naNuvem } from "../nuvem/modo";
+import type { Atender } from "../nuvem/iaNuvem";
+// Projetos pelo disco.ts: no PC a pasta HAXYS_CAD/projetos; na nuvem o aparelho + /api/nuvem/pecas.
+import { gravarNaPasta, lerDaPasta, listarProjetos } from "../arquivo/disco";
+import { baixarNoCelular } from "./celular";
 
 // No celular a ponte passa pela porta do celular (mesmo endereço da página; ver vite.config.ts).
 const ENDERECO = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "http://127.0.0.1:27186" : "";
@@ -58,19 +63,6 @@ const modo = (a: Args) => {
   return m;
 };
 const posicao = (a: Args) => ({ x: num(a, "x") ?? 0, y: num(a, "y") ?? 0, z: num(a, "z") ?? 0 });
-const pontos = (v: unknown, k: string): [number, number][] => {
-  if (v === undefined) return [];
-  if (!Array.isArray(v) || v.length > 2000) throw new Error(`"${k}" precisa ser uma lista de [u, v]`);
-  return v.map((p) => {
-    if (!Array.isArray(p) || p.length !== 2) throw new Error(`cada ponto de "${k}" é [u, v]`);
-    return [num({ u: p[0] }, "u", true)!, num({ v: p[1] }, "v", true)!];
-  });
-};
-const circulos = (v: unknown) => {
-  if (v === undefined) return [];
-  if (!Array.isArray(v) || v.length > 500) throw new Error(`"circulos" precisa ser uma lista de {u, v, r}`);
-  return v.map((c: Args) => ({ u: num(c, "u", true)!, v: num(c, "v", true)!, r: num(c, "r", true)! }));
-};
 
 const eixoXYZ = (a: Args, k: string, padrao: string) => {
   const v = (txt(a, k) ?? padrao).toUpperCase();
@@ -324,8 +316,7 @@ export function ligarPonte(projeto: Projeto, vista: Vista, avisar: (t: string) =
     if (!r.ok) throw new Error(j.erro ?? `erro ${r.status}`);
     return j;
   };
-  const gravarProjeto = (nome: string, texto: string) =>
-    pedirJson(`/api/projetos/${encodeURIComponent(nome)}`, { method: "POST", headers: { "content-type": "application/json" }, body: texto });
+  const gravarProjeto = gravarNaPasta;
   // Antes de trocar de projeto: se há trabalho não salvo, guarda uma cópia.
   const guardarAntesDeTrocar = async () => {
     if (!projeto.modificado() || !projeto.estado.historico.some((o) => o.tipo !== "parametros")) return "";
@@ -704,13 +695,11 @@ export function ligarPonte(projeto: Projeto, vista: Vista, avisar: (t: string) =
         if (!nome || nome === "Sem título") throw new Error('dê um "nome" ao projeto');
         const r = await gravarProjeto(nome, menu.textoDoProjeto(nome));
         menu.marcarSalvoComo(nome);
-        return `Salvo em ${r.arquivo}`;
+        return naNuvem ? r.arquivo : `Salvo em ${r.arquivo}`;
       }
       case "abrir_projeto": {
         const nome = txt(p, "nome", true)!;
-        const r = await fetch(`/api/projetos/${encodeURIComponent(nome)}`);
-        if (!r.ok) throw new Error((await r.json().catch(() => ({}))).erro ?? `o projeto "${nome}" não abriu`);
-        const texto = await r.text();
+        const texto = await lerDaPasta(nome);
         const aviso = await guardarAntesDeTrocar();
         const n = menu.carregarDeTexto(texto, nome);
         apelidos.clear();
@@ -718,8 +707,8 @@ export function ligarPonte(projeto: Projeto, vista: Vista, avisar: (t: string) =
         return `Aberto: ${nome} (${n} operações)${aviso}`;
       }
       case "listar_projetos": {
-        const j = await pedirJson("/api/projetos");
-        return j.projetos.length ? j.projetos.map((x: { nome: string; salvoEm: string }) => `${x.nome} (salvo ${x.salvoEm.slice(0, 16).replace("T", " ")})`).join("\n") : "Nenhum projeto salvo ainda.";
+        const j = await listarProjetos();
+        return j.projetos.length ? j.projetos.map((x) => `${x.nome} (salvo ${x.salvoEm.slice(0, 16).replace("T", " ")})`).join("\n") : "Nenhum projeto salvo ainda.";
       }
       case "exportar": {
         const formato = escolha(p, "formato", ["stl", "step", "3mf"], "3mf") as "stl";
@@ -729,6 +718,8 @@ export function ligarPonte(projeto: Projeto, vista: Vista, avisar: (t: string) =
         const mesa = formato === ("3mf" as string) ? await mesaEscolhida() : { mesa: undefined, deitar: false };
         const dados = await projeto.exportar({ formato, corpos, qualidade: escolha(p, "qualidade", ["baixa", "media", "alta"], "media") as "media", zParaCima: true, mesa: mesa.mesa, deitar: p.deitar === true || mesa.deitar });
         const nome = txt(p, "nome") ?? (menu.nome() === "Sem título" ? "peca" : menu.nome());
+        // Na nuvem não há pasta saida: baixa o arquivo no aparelho.
+        if (naNuvem) return baixarNoCelular(dados, `${nome}.${formato}`), `Baixado: ${nome}.${formato} (${(dados.byteLength / 1024).toFixed(0)} KB)`;
         const r = await pedirJson(`/api/exportar/${encodeURIComponent(`${nome}.${formato}`)}`, { method: "POST", body: dados });
         return `Exportado: ${r.arquivo} (${(r.bytes / 1024).toFixed(0)} KB)${formato === ("3mf" as string) && projeto.avisoExportacao ? `. ${projeto.avisoExportacao}` : ""}`;
       }
@@ -837,5 +828,9 @@ export function ligarPonte(projeto: Projeto, vista: Vista, avisar: (t: string) =
       }
     }
   }
-  void laco();
+  // Na nuvem não há ponte: sem o laço, a marca fica escondida.
+  if (!naNuvem) void laco();
+  // A IA da nuvem (nuvem/iaNuvem.ts) chama as mesmas ações direto, sem a ponte.
+  const atenderDireto: Atender = (p) => atender({ id: "", ...p } as Pedido);
+  return { atender: atenderDireto };
 }

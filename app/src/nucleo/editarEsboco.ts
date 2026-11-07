@@ -373,7 +373,8 @@ export function chanfrarCanto(
   o: { tipo: "igual" | "duas" | "angulo"; d1: number; d2?: number; angulo?: number; primeira?: number },
 ): number[] {
   const c = acharCanto(d, pontoId, o.primeira);
-  let a = o.d1, b = o.d1;
+  const a = o.d1;
+  let b = o.d1;
   if (o.tipo === "duas") b = o.d2 ?? o.d1;
   if (o.tipo === "angulo") {
     const alfa = ((o.angulo ?? 45) * Math.PI) / 180;

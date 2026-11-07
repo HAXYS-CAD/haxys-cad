@@ -349,7 +349,7 @@ function formaDaRevolucao(op: Operacao, esbocos: Map<string, DadosEsboco>, eixos
     } else solido = solidoDosPerfis(op, esbocos, (s) => s.revolve(direcao, { origin: origem, angle: angulo }));
   } catch (err) {
     if (err instanceof Error && /não existe|Nenhum/.test(err.message)) throw err;
-    throw new Error("Não foi possível girar (o eixo corta o perfil?)");
+    throw new Error("Não foi possível girar (o eixo corta o perfil?)", { cause: err });
   }
   return solido;
 }
@@ -1765,7 +1765,7 @@ function formaImportada(op: Operacao): Shape3D {
     }
   } catch (e) {
     if (e instanceof Error) throw e;
-    throw new Error(`Falha ao ${etapa} (${bytes.length} bytes)`);
+    throw new Error(`Falha ao ${etapa} (${bytes.length} bytes)`, { cause: e });
   } finally {
     oc.FS.unlink(nome);
   }
@@ -2187,7 +2187,7 @@ function aplicarInclinacao(op: Operacao, corpos: Corpo[], planos: Map<string, Pl
       if (!d.IsDone()) throw new Error("x");
     } catch (e) {
       if (e instanceof Error && e.message.startsWith("Por enquanto")) throw e;
-      throw new Error("Não foi possível inclinar (face paralela ao plano? ângulo grande demais?)");
+      throw new Error("Não foi possível inclinar (face paralela ao plano? ângulo grande demais?)", { cause: e });
     }
     corpo.forma = cast(d.Shape() as never) as Shape3D;
   }
@@ -3139,7 +3139,7 @@ function solidoDaMalha(m: Malha): Shape3D {
     return forma;
   } catch (e) {
     if (e instanceof Error) throw e;
-    throw new Error("Não foi possível converter a malha (use Reparar antes)");
+    throw new Error("Não foi possível converter a malha (use Reparar antes)", { cause: e });
   } finally {
     oc.FS.unlink(nome);
   }

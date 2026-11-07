@@ -1,5 +1,15 @@
 # Novidades · Changelog
 
+## 0.1.3 — ícone do celular e código mais limpo · mobile icon and cleaner code
+
+- Celular: o ícone do cervo (`/icone.png`) e o manifesto agora abrem antes do pareamento, para o celular poder
+  buscá-los ao "Adicionar à Tela de Início". O resto continua fechado sem o QR.
+- Código revisado com o ESLint: 140 avisos viraram 15 (só arquivos grandes). Sem mudança no uso.
+
+**English:** the deer icon and the web manifest are now served before pairing, so phones can fetch them when adding to
+the home screen; everything else still needs the QR. Code cleaned up with ESLint (140 warnings down to 15, no change in
+use).
+
 ## 0.1.2 — celular mais limpo e ponte mais firme · cleaner mobile, sturdier bridge
 
 - Celular: a tela mostra só a barra de cima (Arquivo, Salvar, Exportar…), a peça e o cubo de vistas. A caixa da IA tem

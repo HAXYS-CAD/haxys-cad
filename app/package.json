@@ -1,11 +1,15 @@
 {
   "name": "haxys-cad",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "lint": "eslint .",
+    "tipos": "tsc",
+    "conferir": "npm run tipos && npm run lint",
+    "nuvem": "tsc && vite build --mode nuvem --outDir dist-nuvem",
     "faixa": "node ../ferramentas/gerar_faixa.mjs",
     "servidor": "esbuild vite.config.ts --bundle --platform=node --format=esm --packages=external --outfile=servidor.mjs --log-level=warning",
     "programa": "npm run build && npm run servidor && electron .",
@@ -17,14 +21,17 @@
     "vite": "^6.4.5"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/three": "^0.170.0",
     "electron": "^45.0.0",
     "electron-builder": "^26.15.3",
+    "eslint": "^10.14.0",
     "qrcode-generator": "^1.4.4",
     "replicad": "^1.1.0",
     "replicad-opencascadejs": "^1.1.0",
     "three": "^0.170.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.72.1"
   },
   "description": "HAXYS CAD - CAD 3D da HAXYS",
   "author": "HAXYS",
@@ -48,6 +55,10 @@
       {
         "from": "../ponte/haxys-ponte.mjs",
         "to": "ponte/haxys-ponte.mjs"
+      },
+      {
+        "from": "../ponte/ferramentas.mjs",
+        "to": "ponte/ferramentas.mjs"
       },
       {
         "from": "../ferramentas/fusion_trazer.py",

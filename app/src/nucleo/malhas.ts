@@ -824,10 +824,7 @@ export function alinharMalha(m: Malha, alvo: ArrayLike<number>, passadas = 60): 
     R = nR;
     const gt = giro(sub(t, ca));
     t = [gt[0] + cb[0], gt[1] + cb[1], gt[2] + cb[2]];
-    if (Math.abs(erro - novoErro) < 1e-7) {
-      erro = novoErro;
-      break;
-    }
+    if (Math.abs(erro - novoErro) < 1e-7) break;
     erro = novoErro;
   }
   const final = fonte.map(aplicar);

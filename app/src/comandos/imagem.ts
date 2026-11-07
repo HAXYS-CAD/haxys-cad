@@ -154,6 +154,7 @@ export async function pecaDaImagem(url: string, nomeArq: string, raiz: HTMLEleme
   };
   const previa = (esboco: DadosEsboco): Operacao => ({ id: idPrevia, tipo: "esboco", nome: "Prévia da imagem", modo: "novo", params: {}, esboco });
   let dialogo: { definirSelecao(t: string): void } | undefined;
+  // eslint-disable-next-line prefer-const -- a janela usa "dialogo" antes de abrirDialogo devolver; com const daria erro
   dialogo = abrirDialogo(raiz, {
     titulo: `Peça a partir de imagem: ${nomeArq}`,
     campos: [
@@ -187,7 +188,7 @@ export async function pecaDaImagem(url: string, nomeArq: string, raiz: HTMLEleme
       }
     },
     aoOK: (v, _m, esc) => {
-      let r = ultimo;
+      let r: typeof ultimo;
       try {
         r = calcular(v, esc);
       } catch (e) {

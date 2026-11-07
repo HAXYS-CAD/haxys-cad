@@ -2,6 +2,7 @@
 // quando a tela é de toque e pequena (ou com ?celular no endereço); o estilo.css faz o resto.
 // No PC: botão 📱 abre o QR code que liga o celular ao HAXYS CAD deste PC (porta 5174, vite.config.ts).
 import qrcode from "qrcode-generator";
+import { naNuvem } from "../nuvem/modo";
 
 export const noCelular = document.documentElement.classList.contains("celular");
 
@@ -65,8 +66,9 @@ export function ligarCelular() {
 }
 
 // Exportação no celular: além de gravar na pasta do PC, baixa o arquivo no próprio celular.
+// Na nuvem não há pasta do PC: baixa sempre (celular ou navegador de PC).
 export function baixarNoCelular(dados: ArrayBuffer, nome: string) {
-  if (!noCelular) return;
+  if (!noCelular && !naNuvem) return;
   const url = URL.createObjectURL(new Blob([dados], { type: "application/octet-stream" }));
   const a = Object.assign(document.createElement("a"), { href: url, download: nome });
   document.body.appendChild(a);

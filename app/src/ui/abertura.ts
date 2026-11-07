@@ -10,6 +10,7 @@ import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import svgLogo from "./logoHaxysCad.svg?raw";
+import { naNuvem } from "../nuvem/modo";
 
 const TEMPO_MINIMO = 3200; // ms: dá tempo de ver pelo menos uma passada de luz
 const TEMPO_MAXIMO = 30000; // se o núcleo travar, a abertura não prende a tela
@@ -22,7 +23,8 @@ caixa.style.cssText = "position:fixed;inset:0;z-index:99999;overflow:hidden;tran
 const tela = document.createElement("canvas");
 tela.style.cssText = "position:absolute;inset:0;width:100%;height:100%";
 const texto = document.createElement("div");
-texto.textContent = "Carregando…";
+// Na nuvem, 1ª vez (ainda sem o service worker): o WASM de ~23 MB vem pela internet.
+texto.textContent = naNuvem && !navigator.serviceWorker?.controller ? "Carregando o HAXYS CAD… Na 1ª vez pode demorar." : "Carregando…";
 texto.style.cssText =
   "position:absolute;left:0;right:0;bottom:7%;text-align:center;font:13px system-ui,sans-serif;" +
   "letter-spacing:.2em;color:#8f9bb0;text-transform:uppercase;transition:color .4s";

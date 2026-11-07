@@ -136,7 +136,7 @@ export function simplificar(l: Pt[], tol: number): Pt[] {
   }
   const a = dp(l.slice(0, j + 1));
   const b = dp([...l.slice(j), l[0]]);
-  let r = [...a.slice(0, -1), ...b.slice(0, -1)];
+  const r = [...a.slice(0, -1), ...b.slice(0, -1)];
   // Tira pontos que ficaram no meio de uma reta.
   for (let mudou = true; mudou && r.length > 3; ) {
     mudou = false;

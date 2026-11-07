@@ -14,6 +14,10 @@ import { lerDoFusion, paraOperacoes } from "./trazerFusion";
 import { abrirDialogo } from "../ui/dialogo";
 import type { OpcoesExportar } from "../nucleo/tipos";
 import { baixarNoCelular, noCelular } from "../ui/celular";
+import { naNuvem } from "../nuvem/modo";
+import { abrirSalvarEnviar, type FormatoEnvio } from "./salvarEnviar";
+import { abrirLigarCelular, lerNuvemPc, marcarVistas } from "../nuvem/doCelular";
+import { abrirConvidar } from "../nuvem/convidar";
 
 const CHAVE_RECUPERACAO = "haxys-cad:recuperacao";
 const SEM_TITULO = "Sem título";
@@ -114,10 +118,11 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
     }
   }
 
-  async function abrir() {
+  // "so": Arquivo > Do celular (só as peças que vieram do celular).
+  async function abrir(so?: string[]) {
     if (!podeDescartar()) return;
     try {
-      const escolha = await escolherProjeto("abrir", nome);
+      const escolha = await escolherProjeto("abrir", nome, so);
       if (!escolha) return;
       if (escolha === OUTRO_ARQUIVO) {
         const f = await lerDoComputador();
@@ -125,7 +130,7 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
         const ext = (/\.([^.]+)$/.exec(f.name)?.[1] ?? "").toLowerCase();
         // Formatos fechados (do Fusion, Inventor, SketchUp, AutoCAD, ACIS): só o programa dono abre.
         // .f3d/.f3z: o Fusion entrega pela porta 27185 o desenho aberto nele.
-        if (ext === "f3d" || ext === "f3z") return trazerDoFusion(f.name.replace(/\.[^.]+$/, ""));
+        if (ext === "f3d" || ext === "f3z") return naNuvem ? o.avisar("Isso só existe no HAXYS CAD do PC.") : trazerDoFusion(f.name.replace(/\.[^.]+$/, ""));
         const FECHADOS: Record<string, string> = { ipt: "Autodesk Inventor", skp: "SketchUp", dwg: "AutoCAD (DWG)", sat: "ACIS (SAT)", smt: "Autodesk ShapeManager (SMT)" };
         if (FECHADOS[ext])
           return o.avisar(`Arquivo do ${FECHADOS[ext]} (.${ext}): formato fechado, só o programa dono abre. No Fusion use Arquivo > Exportar > STEP (peça sólida) ou 3MF/STL (malha) e abra aqui esse arquivo.`);
@@ -195,7 +200,7 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
       projeto.marcarSalvo();
       guardarCopia(null);
       atualizarNome();
-      o.avisar(`Salvo em ${r.arquivo}`);
+      o.avisar(naNuvem ? r.arquivo : `Salvo em ${r.arquivo}`); // na nuvem o aviso já vem pronto (salvo ou sem internet)
       void gravarMiniatura(nome);
     } catch (e) {
       o.avisar(`Não foi possível salvar: ${e instanceof Error ? e.message : String(e)}`);
@@ -236,12 +241,23 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
           const sugestao = opcoes.corpos.length === 1 ? `${nome} - ${opcoes.corpos[0]}` : nome;
           const gravado = await gravarExportacao(dados, sugestao, ext);
           baixarNoCelular(dados, sugestao + ext);
+          const kb = (dados.byteLength / 1024).toFixed(0);
+          if (naNuvem) return o.avisar(`Baixado: ${gravado} (${kb} KB)`);
           o.avisar(noCelular ? `Baixado no celular: ${sugestao}${ext} (${(dados.byteLength / 1024).toFixed(0)} KB). Também ficou na pasta saida do PC.` : `Exportado em ${gravado} (${(dados.byteLength / 1024).toFixed(0)} KB)`);
         } catch (e) {
           o.avisar(`Não foi possível exportar: ${e instanceof Error ? e.message : String(e)}`);
         }
       },
     });
+  }
+
+  // Arquivo do "Salvar e enviar": a peça (.haxys) ou os corpos visíveis exportados.
+  async function arquivoParaEnviar(formato: FormatoEnvio): Promise<File> {
+    if (formato === "haxys") return new File([serializar(nome, projeto.estado.historico, o.ocultos)], `${nome}.haxys`, { type: "application/json" });
+    const corpos = projeto.estado.corpos.filter((c) => !o.ocultos.has(c.nome)).map((c) => c.nome);
+    if (!corpos.length) throw new Error("não há corpo visível");
+    const dados = await projeto.exportar({ formato, corpos, qualidade: "media", zParaCima: true });
+    return new File([dados], `${nome}.${formato}`, { type: "application/octet-stream" });
   }
 
   // ---- Menu ----
@@ -251,12 +267,23 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
   menu.hidden = true;
   const itens: [string, string, () => void][] = [
     ["Novo projeto", "", novo],
-    ["Abrir…", "Ctrl+O", abrir],
+    ["Abrir…", "Ctrl+O", () => abrir()],
     ["Salvar", "Ctrl+S", () => salvar(false)],
     ["Salvar como…", "Ctrl+Shift+S", () => salvar(true)],
     ["Exportar…", "", exportar],
-    ["Trazer do Fusion", "", () => podeDescartar() && void trazerDoFusion()],
   ];
+  // Fusion só no PC (o servidor do PC lê o Fusion aberto).
+  if (!naNuvem) itens.push(["Trazer do Fusion", "", () => podeDescartar() && void trazerDoFusion()]);
+  // Celular (pelo PC ou pela nuvem): baixar no aparelho ou mandar por WhatsApp, e-mail, outro app.
+  if (noCelular || naNuvem) itens.push(["Salvar e enviar…", "", () => (o.antesDeTrocar(), abrirSalvarEnviar(arquivoParaEnviar, o.avisar))]);
+  // Caminho B, só no PC: recebe as peças salvas no celular (nuvem/doCelular.ts).
+  if (!naNuvem && !noCelular)
+    itens.push(
+      ["Ligar ao meu celular…", "", () => abrirLigarCelular(o.avisar)],
+      ["Do celular…", "", () => void lerNuvemPc().then((e) => (void marcarVistas().catch(() => {}), abrir(e.recebidas)), (e) => o.avisar(`Não foi possível ler: ${e instanceof Error ? e.message : String(e)}`))],
+      ["Convidar…", "", () => abrirConvidar(o.avisar)],
+    );
+  let liConvidar: HTMLLIElement | undefined;
   for (const [texto, atalho, fn] of itens) {
     const li = document.createElement("li");
     li.innerHTML = `<span>${texto}</span><em>${atalho}</em>`;
@@ -265,6 +292,8 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
       fn();
     });
     menu.appendChild(li);
+    // "Convidar…" só para o dono (senha de administrador guardada no PC).
+    if (texto === "Convidar…") (li.hidden = true), (liConvidar = li);
   }
   document.body.appendChild(menu);
   o.botaoMenu.addEventListener("click", () => {
@@ -272,6 +301,7 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
     menu.style.left = `${r.left}px`;
     menu.style.top = `${r.bottom + 2}px`;
     menu.hidden = !menu.hidden;
+    if (liConvidar && !menu.hidden) void lerNuvemPc().then((e) => (liConvidar!.hidden = !e.admin), () => {});
   });
   document.addEventListener("pointerdown", (e) => {
     if (!menu.contains(e.target as Node) && e.target !== o.botaoMenu) menu.hidden = true;
@@ -350,7 +380,7 @@ export function criarMenuArquivo(o: OpcoesMenuArquivo): MenuArquivo {
       if (!e.ctrlKey) return false;
       const k = e.key.toLowerCase();
       if (k === "s") return salvar(e.shiftKey), true;
-      if (k === "o") return abrir(), true;
+      if (k === "o") return void abrir(), true;
       return false;
     },
   };

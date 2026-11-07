@@ -43,6 +43,10 @@ import { abrirVoz } from "./ui/voz";
 import { ligarAjuda } from "./ui/ajuda";
 import { ligarPonte } from "./ui/ponte";
 import { abrirParearCelular, ligarCelular, noCelular } from "./ui/celular";
+import { naNuvem } from "./nuvem/modo";
+import { mostrarBoasVindas } from "./nuvem/boasVindas";
+import { enviarPendentes } from "./nuvem/discoNuvem";
+import { vigiarCelular } from "./nuvem/doCelular";
 import { criarArraste } from "./vista/arrastar";
 import { COMANDOS_BASE, comandoOperacaoBase } from "./comandos/operacaoBase";
 import { abrirConexoes, abrirDependencias, abrirPilhaFixadores, abrirEstatisticas, abrirLocalizarOperacoes, abrirSemelhantes } from "./comandos/localizar";
@@ -125,11 +129,13 @@ function avisar(texto: string) {
 
 // A janela preta é o servidor: sem ela, a tela segue viva mas pasta, IA e Bambu param.
 const servidorCaiu = $(".servidor-caiu");
-setInterval(() => {
-  fetch("/api/projetos", { cache: "no-store" })
-    .then((r) => (servidorCaiu.hidden = r.ok))
-    .catch(() => (servidorCaiu.hidden = false));
-}, 5000);
+// Na nuvem não há servidor do PC: não confere nem mostra o aviso.
+if (!naNuvem)
+  setInterval(() => {
+    fetch("/api/projetos", { cache: "no-store" })
+      .then((r) => (servidorCaiu.hidden = r.ok))
+      .catch(() => (servidorCaiu.hidden = false));
+  }, 5000);
 
 const projeto = new Projeto(avisar);
 
@@ -177,7 +183,11 @@ for (const x of EXTRAS_SUPERFICIE) {
 }
 const faixa = criarFaixa($(".faixa"), abas as Aba[], usarFerramenta);
 
+// Comandos que chamam o servidor do PC (/api/bambu, /api/laser): na nuvem não existem.
+const SO_NO_PC = [COMANDO_IMPRIMIR, COMANDO_LASER, COMANDO_REFERENCIA];
+
 function usarFerramenta(f: Ferramenta) {
+  if (naNuvem && SO_NO_PC.includes(f.id)) return avisar("Isso só existe no HAXYS CAD do PC.");
   if (f.id === "SketchCreate") {
     editandoEsboco = null;
     return modoEsboco.iniciar();
@@ -267,7 +277,7 @@ function usarFerramenta(f: Ferramenta) {
   if (f.id === COMANDO_IMAGEM) return comandoImagem(areaComando, projeto, avisar);
   if (f.id === COMANDO_REFERENCIA) return comandoReferencia(areaComando, avisar);
   if (f.id === COMANDO_LASER) return comandoLaser(areaComando, projeto, nomeProjeto, avisar);
-  if (f.id === "HaxysVozCommand") return abrirVoz(projeto, avisar);
+  if (f.id === "HaxysVozCommand") return abrirVoz(projeto, avisar, atender);
   if (f.id === "ScriptsManagerCommand") return abrirConsoleScript(projeto);
   if (COMANDOS_ANOTACAO[f.id]) return void comandoAnotacao(COMANDOS_ANOTACAO[f.id], areaComando, projeto, selecao, avisar);
   if (COMANDOS_SUPERFICIE[f.id]) return comandoSuperficie(COMANDOS_SUPERFICIE[f.id], areaComando, projeto, avisar);
@@ -764,12 +774,23 @@ projeto.aoMudar((estado) => {
   if (isocurvasLigadas && !estado.calculando && estado.historico !== historicoIso) void atualizarIsocurvas();
 });
 // Ponte com as IAs (MCP): a IA abre o HAXYS CAD e constrói a peça sozinha.
-ligarPonte(projeto, vista, avisar, menuArquivo);
+// As mesmas ações servem à IA da nuvem (atender), que roda na página.
+const { atender } = ligarPonte(projeto, vista, avisar, menuArquivo);
 
 // Celular: no PC o 📱 mostra o QR code; no celular, a barra de toque (ui/celular.ts).
-$(".botao-celular").addEventListener("click", () => void abrirParearCelular(avisar));
+// Na nuvem não há PC para parear: sem 📱.
+if (naNuvem) $(".botao-celular").remove(), $(".botao-ligar-ia").remove(); // na nuvem a IA já vem ligada
+else $(".botao-celular").addEventListener("click", () => void abrirParearCelular(avisar));
 ligarCelular();
-if (noCelular) abrirVoz(projeto, avisar); // no celular a IA é a tela principal
+if (noCelular) abrirVoz(projeto, avisar, atender); // no celular a IA é a tela principal
+if (naNuvem) void mostrarBoasVindas();
+// Na nuvem: peças salvas sem internet sobem ao abrir e quando a internet volta.
+if (naNuvem) void enviarPendentes(), window.addEventListener("online", () => void enviarPendentes());
+// No PC: avisa quando chegam peças salvas no celular (só depois de Arquivo > Ligar ao meu celular).
+else if (!noCelular) vigiarCelular(avisar);
+// Na nuvem: app instalável (public/sw.js); "?v=" = este build (o nome do JS principal tem o hash).
+if (naNuvem && "serviceWorker" in navigator)
+  void navigator.serviceWorker.register(`/sw.js?v=${encodeURIComponent(new URL(import.meta.url).pathname.split("/").pop() ?? "")}`).catch(() => {});
 if (noCelular) servidorCaiu.textContent = "Sem ligação com o HAXYS CAD do PC. Confira se o PC está ligado, com o HAXYS CAD aberto, e se o celular está na mesma Wi-Fi.";
 desenhar();
 

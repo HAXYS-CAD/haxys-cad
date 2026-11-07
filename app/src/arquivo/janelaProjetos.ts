@@ -1,6 +1,7 @@
 // Janela de projetos (como o painel de dados do Fusion): lista HAXYS_CAD/projetos.
 // Abrir: escolhe um da lista ou "Outro arquivo do computador…".
 // Salvar como: digita o nome (clicar na lista copia o nome).
+// "so": só esses projetos (Arquivo > Do celular, peças que vieram do celular).
 import { listarProjetos, urlImagemProjeto, type ProjetoNaPasta } from "./disco";
 
 export const OUTRO_ARQUIVO = Symbol("outro");
@@ -8,7 +9,7 @@ export type EscolhaProjeto = { nome: string; existe: boolean } | typeof OUTRO_AR
 
 const escapar = (t: string) => t.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
-export async function escolherProjeto(modo: "abrir" | "salvar", nomeAtual: string): Promise<EscolhaProjeto> {
+export async function escolherProjeto(modo: "abrir" | "salvar", nomeAtual: string, so?: string[]): Promise<EscolhaProjeto> {
   let lista: ProjetoNaPasta[] = [];
   let pasta = "";
   let erro = "";
@@ -17,12 +18,13 @@ export async function escolherProjeto(modo: "abrir" | "salvar", nomeAtual: strin
   } catch (e) {
     erro = e instanceof Error ? e.message : String(e);
   }
+  if (so) lista = lista.filter((p) => so.includes(p.nome));
 
   const j = document.createElement("div");
   j.className = "janela-parametros janela-projetos";
   j.setAttribute("role", "dialog");
   j.innerHTML = `
-    <div class="jp-titulo"><span>${modo === "abrir" ? "Abrir projeto" : "Salvar como"}</span><button class="fechar" title="Fechar (Esc)">✕</button></div>
+    <div class="jp-titulo"><span>${so ? "Do celular" : modo === "abrir" ? "Abrir projeto" : "Salvar como"}</span><button class="fechar" title="Fechar (Esc)">✕</button></div>
     <div class="jp-corpo">
       <div class="jp-dica">Pasta: ${escapar(pasta || "HAXYS_CAD\\projetos")}</div>
       ${erro ? `<p class="erro">Não foi possível ler a pasta: ${escapar(erro)}</p>` : ""}
@@ -33,12 +35,12 @@ export async function escolherProjeto(modo: "abrir" | "salvar", nomeAtual: strin
               `<li data-i="${i}" tabindex="0" title="${escapar(p.nome)}"><div class="jp-foto"><img alt="" src="${urlImagemProjeto(p.nome, p.salvoEm)}" onerror="this.replaceWith('⬡')"></div><span>${escapar(p.nome)}</span><em>${new Date(p.salvoEm).toLocaleString("pt-BR")}</em></li>`,
           )
           .join("") ||
-        `<li class="vazio">Nenhum projeto salvo ainda.</li>`
+        `<li class="vazio">${so ? "Nenhuma peça do celular ainda." : "Nenhum projeto salvo ainda."}</li>`
       }</ul>
       ${modo === "salvar" ? `<label class="jp-nome">Nome <input value="${escapar(nomeAtual)}" maxlength="80"></label>` : ""}
     </div>
     <div class="jp-botoes">
-      ${modo === "abrir" ? `<button class="outro secundario">Outro arquivo do computador…</button>` : ""}
+      ${modo === "abrir" && !so ? `<button class="outro secundario">Outro arquivo do computador…</button>` : ""}
       <button class="ok">${modo === "abrir" ? "Abrir" : "Salvar"}</button>
     </div>`;
   document.body.appendChild(j);
