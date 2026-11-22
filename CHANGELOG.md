@@ -1,5 +1,13 @@
 # Novidades · Changelog
 
+## 0.1.4 — atualiza sozinho · auto-update
+
+- A partir desta versão, o HAXYS CAD procura versão nova ao abrir, baixa sem atrapalhar e instala quando você fecha o
+  programa. Quem tem a 0.1.3 ou mais antiga precisa instalar a 0.1.4 uma vez pelo link de sempre.
+
+**English:** from this version on, HAXYS CAD checks for a new version when it opens, downloads it in the background and
+installs it when you close the program. If you have 0.1.3 or older, install 0.1.4 once from the usual link.
+
 ## 0.1.3 — ícone do celular e código mais limpo · mobile icon and cleaner code
 
 - Celular: o ícone do cervo (`/icone.png`) e o manifesto agora abrem antes do pareamento, para o celular poder
