@@ -1,5 +1,15 @@
 # Novidades · Changelog
 
+## 0.1.5 — STEP com várias peças · multi-part STEP
+
+- Abrir um STEP com várias peças (ex.: exportado do Fusion) agora cria **um corpo para cada peça**, como no Fusion.
+  Na janela Inserir, "Peças do arquivo: Num corpo só" mantém o jeito antigo. Projetos já salvos não mudam.
+- STEP vazio agora avisa "Esse STEP está vazio…" em vez de um erro sem sentido.
+
+**English:** opening a STEP with several parts now creates one body per part, like Fusion ("Num corpo só" in the Insert
+window keeps the old behavior; saved projects are unchanged). An empty STEP now shows a clear message instead of an
+engine error.
+
 ## 0.1.4 — atualiza sozinho · auto-update
 
 - A partir desta versão, o HAXYS CAD procura versão nova ao abrir, baixa sem atrapalhar e instala quando você fecha o

@@ -609,7 +609,11 @@ export function inserirArquivo(nomeArq: string, bytes: Uint8Array, raiz: HTMLEle
       { chave: "y", rotulo: "Posição Y", valor: 0 },
       { chave: "z", rotulo: "Posição Z", valor: 0 },
     ],
-    escolhas: [{ chave: "zParaCima", rotulo: "O arquivo tem", opcoes: [["sim", "Z para cima (impressora/CAD)"], ["nao", "Y para cima"]], valor: "sim" }],
+    escolhas: [
+      { chave: "zParaCima", rotulo: "O arquivo tem", opcoes: [["sim", "Z para cima (impressora/CAD)"], ["nao", "Y para cima"]], valor: "sim" },
+      // Projetos antigos não têm "separar": continuam com um corpo só (não muda o nome dos corpos deles).
+      ...(formato === "step" ? [{ chave: "separar", rotulo: "Peças do arquivo", opcoes: [["sim", "Separadas"], ["nao", "Num corpo só"]] as [string, string][], valor: "sim" }] : []),
+    ],
     modo: "novo",
     semModo: true,
     aoMudar: (p, _m, esc) => projeto.previsualizar(montar(p, esc)),

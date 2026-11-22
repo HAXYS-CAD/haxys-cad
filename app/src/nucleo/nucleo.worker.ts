@@ -1751,7 +1751,12 @@ function formaImportada(op: Operacao): Shape3D {
       etapa = "converter o STEP";
       leitor.TransferRoots(new oc.Message_ProgressRange());
       etapa = "pegar a forma do STEP";
-      forma = cast(leitor.OneShape() as never) as Shape3D;
+      // STEP sem nenhuma face (ex.: o Fusion exporta vazio um corpo que veio de malha): avisa já, senão quebra depois.
+      const vazio = "Esse STEP está vazio: não tem nenhuma peça. No outro programa, exporte em STL ou 3MF.";
+      const bruta = leitor.OneShape() as { IsNull(): boolean };
+      if (bruta.IsNull()) throw new Error(vazio);
+      forma = cast(bruta as never) as Shape3D;
+      if (!forma.faces.length) throw new Error(vazio);
     } else {
       etapa = "ler o STL";
       const leitor = new oc.StlAPI_Reader();
@@ -2813,8 +2818,12 @@ function aplicarOperacao(op: Operacao, estado: Estado) {
                 : formaDa(op);
   const alvos = corpos.filter((c) => tocam(c.forma, ferramenta));
   if (op.modo === "novo" || (op.modo === "unir" && alvos.length === 0)) {
-    estado.contador += 1;
-    corpos.push({ id: `${op.id}:${estado.contador}`, nome: `Corpo${estado.contador}`, forma: ferramenta, origem: op.id });
+    // STEP com várias peças e "separar": um corpo por sólido, como no Fusion.
+    const pecas = op.tipo === "importado" && op.opcoes?.separar === "sim" ? ((ferramenta as unknown as { solids?: Shape3D[] }).solids ?? []) : [];
+    for (const forma of pecas.length > 1 ? pecas : [ferramenta]) {
+      estado.contador += 1;
+      corpos.push({ id: `${op.id}:${estado.contador}`, nome: `Corpo${estado.contador}`, forma, origem: op.id });
+    }
   } else if (op.modo === "unir") {
     // Junta a ferramenta e todos os corpos que ela toca no primeiro deles.
     let unido = alvos[0].forma.fuse(ferramenta);
