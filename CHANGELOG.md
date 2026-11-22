@@ -1,5 +1,19 @@
 # Novidades · Changelog
 
+## 0.1.6 — ligar a IA em 3 passos · AI setup in 3 steps
+
+- "Ligar IA" agora abre direto o Gemini grátis em 3 passos: abrir o Google e criar a chave, colar a chave, Ligar a IA
+  (testa e salva de uma vez). Erros em palavras simples ("Chave errada", "Sem internet", "Acabou o limite grátis").
+  GPT, Claude, IA no PC, Codex e conector MCP ficam em "Outras opções".
+- O passo a passo da IA não aparece mais toda vez que o programa abre: só uma vez, e nunca com a IA já escolhida.
+  Para trocar de IA: botão "Ligar IA".
+- Mandar para a Bambu: 3MF feito por outro programa abre no Bambu Studio em vez de dar erro.
+
+**English:** "Ligar IA" now opens free Gemini in 3 steps (open Google and create the key, paste it, connect — tested and
+saved at once), with plain error messages; other AIs are under "Outras opções". The AI setup no longer shows up every
+time the program opens (only once, never after an AI was chosen). Sending a 3MF made by another program to Bambu Studio
+now opens it instead of failing.
+
 ## 0.1.5 — STEP com várias peças · multi-part STEP
 
 - Abrir um STEP com várias peças (ex.: exportado do Fusion) agora cria **um corpo para cada peça**, como no Fusion.

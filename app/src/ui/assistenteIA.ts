@@ -81,7 +81,64 @@ export function abrirAssistenteIA(aoFechar?: () => void) {
     if (!r.ok) throw new Error(j.erro ?? `Erro ${r.status}`);
   };
 
-  // Tela 1: o que a IA faz + aviso de custo + caminhos.
+  // Erro da IA em palavras simples (o texto original vem do servidor ou da empresa da IA).
+  const simples = (m: string) =>
+    /não aceitou a chave|valid api key|api key not valid|api_key_invalid|invalid.{0,20}key|\b40[13]\b|permission_denied|unauthenticated/i.test(m)
+      ? "Chave errada: copie de novo a chave no Google e cole aqui."
+      : /\b429\b|quota|resource_exhausted|rate.?limit/i.test(m)
+        ? "Acabou o limite grátis de agora. Espere alguns minutos ou tente amanhã."
+        : /sem ligação|fetch failed|enotfound|econn|network|timeout/i.test(m)
+          ? "Sem internet (ou o Google não respondeu). Confira a conexão e tente de novo."
+          : m;
+
+  // Tela padrão: Gemini grátis em 3 passos (testa e salva de uma vez). O resto fica em "Outras opções".
+  const GEMINI = EMPRESAS[0];
+  const rapido = async (trocar = false) => {
+    const s = await estadoIA();
+    if (s?.ligada && !trocar) {
+      const nome = s.ligada === "chave" ? (EMPRESAS.find((e) => e.base === s.base)?.nome ?? "IA com chave") : s.ligada === "codex" ? "Codex (ChatGPT)" : s.ligada === "claude" ? "Claude Code" : s.ligada;
+      corpo.innerHTML = `<p class="ai-ok">✔ IA ligada: ${esc(nome)}</p>
+        <div class="ai-botoes"><button class="ai-trocar">Trocar a IA</button><button class="ai-outras">Outras opções</button><button class="ai-fim">Fechar</button></div>`;
+      corpo.querySelector(".ai-trocar")!.addEventListener("click", () => void rapido(true));
+      corpo.querySelector(".ai-outras")!.addEventListener("click", inicio);
+      corpo.querySelector(".ai-fim")!.addEventListener("click", fechar);
+      return;
+    }
+    corpo.innerHTML = `
+      <p><b>Ligar a IA grátis (Google Gemini)</b></p>
+      <ol class="ai-passos ai-rapido">
+        <li><a class="ai-abrir" href="${GEMINI.chave}" target="_blank" rel="noopener">Abrir o Google e criar a chave ↗</a>
+          <span>Entre com a sua conta Google, clique em "Create API key" e copie a chave.</span></li>
+        <li><label class="ai-campo">Cole a chave aqui <input class="ai-chave" type="password" autocomplete="off" spellcheck="false" placeholder="cole a chave (Ctrl+V)"></label></li>
+        <li><button class="ai-ligar">Ligar a IA</button></li>
+      </ol>
+      <p class="ai-resultado" role="status"></p>
+      <p class="ai-nota">Grátis com a cota do Google. O HAXYS CAD não cobra nada. A chave fica só neste computador.</p>
+      <p><a href="#" class="ai-outras">Outras opções (GPT, Claude, IA no PC, Codex, conector MCP) →</a></p>`;
+    const res = corpo.querySelector<HTMLParagraphElement>(".ai-resultado")!;
+    const campo = corpo.querySelector<HTMLInputElement>(".ai-chave")!;
+    corpo.querySelector(".ai-outras")!.addEventListener("click", (ev) => (ev.preventDefault(), inicio()));
+    corpo.querySelector(".ai-ligar")!.addEventListener("click", async () => {
+      const chave = campo.value.trim();
+      if (!chave) return void ((res.className = "ai-resultado ai-ruim"), (res.textContent = "Cole a chave no passo 2."));
+      const dados = { modo: "chave", base: GEMINI.base, modelo: GEMINI.modelo, chave };
+      res.className = "ai-resultado";
+      res.textContent = "Ligando… (alguns segundos)";
+      try {
+        const r = await fetch("/api/ia/teste", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(dados) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.erro ?? `Erro ${r.status}`);
+        await salvar(dados);
+        salvo("chave");
+      } catch (err) {
+        res.className = "ai-resultado ai-ruim";
+        res.textContent = `✖ ${simples(err instanceof Error ? err.message : String(err))}`;
+      }
+    });
+    campo.focus();
+  };
+
+  // Outras opções: o que a IA faz + aviso de custo + caminhos.
   const inicio = () => {
     corpo.innerHTML = `
       <p>Com a IA ligada, o HAXYS CAD cria peças do zero <b>pela sua voz</b> (botão de microfone 🎤), usando fotos e medidas de referência que você mandar.</p>
@@ -96,6 +153,7 @@ export function abrirAssistenteIA(aoFechar?: () => void) {
     corpo.querySelectorAll<HTMLButtonElement>("[data-c]").forEach((b) =>
       b.addEventListener("click", () => ({ gratis: semPagar, chave: () => escolherEmpresa(EMPRESAS), conta, fora })[b.dataset.c!]!()),
     );
+    voltar(() => void rapido());
   };
   const voltar = (f: () => void) => {
     const b = document.createElement("button");
@@ -202,5 +260,5 @@ export function abrirAssistenteIA(aoFechar?: () => void) {
     voltar(inicio);
   };
 
-  inicio();
+  void rapido();
 }

@@ -121,7 +121,10 @@ function servicoBambu(): Plugin {
       if (!existsSync(BAMBU)) return responder(200, { arquivo, aberto: false, erro: "Bambu Studio não encontrado" });
       // Com a impressora: vira projeto do Bambu Studio com as mesas (se falhar, abre o 3MF simples).
       const impressora = decodeURIComponent(String(req.headers["x-impressora"] ?? ""));
-      const falhaMesas = impressora && lerImpressoras().some((i) => i.nome === impressora) ? await montarProjeto(BAMBU, dados, impressora, arquivo) : "sem impressora";
+      const falhaMesas =
+        impressora && lerImpressoras().some((i) => i.nome === impressora)
+          ? await montarProjeto(BAMBU, dados, impressora, arquivo).catch((e: unknown) => (e instanceof Error ? e.message : String(e)))
+          : "sem impressora";
       spawn(BAMBU, [arquivo], { detached: true, stdio: "ignore" }).unref();
       responder(200, { arquivo, aberto: true, mesas: falhaMesas === null, erroMesas: falhaMesas ?? undefined });
     } catch (e) {
@@ -240,9 +243,10 @@ async function chamarPonte(method: string, params: unknown): Promise<RespostaPon
   if (j.error) throw new Error(j.error.message);
   return j.result ?? {};
 }
-function erroDaEmpresa(codigo: number, j: { error?: { message?: string } | string } | null): string {
+function erroDaEmpresa(codigo: number, resposta: { error?: { message?: string } | string } | { error?: { message?: string } }[] | null): string {
+  const j = Array.isArray(resposta) ? resposta[0] : resposta; // o Gemini manda o erro dentro de uma lista
   const msg = (typeof j?.error === "string" ? j.error : j?.error?.message ?? "").slice(0, 300);
-  if (codigo === 401 || codigo === 403) return `A empresa da IA não aceitou a chave. Confira se colou a chave inteira. (${msg})`;
+  if (codigo === 401 || codigo === 403 || (codigo === 400 && /api.?key/i.test(msg))) return `A empresa da IA não aceitou a chave. Confira se colou a chave inteira. (${msg})`;
   if (codigo === 429) return `Limite da sua conta atingido (cota grátis ou créditos). Espere um pouco ou confira o plano no site da empresa. (${msg})`;
   if (codigo === 404) return `Modelo ou endereço não encontrado: confira o nome do modelo. (${msg})`;
   return `A IA respondeu com erro ${codigo}. ${msg}`;

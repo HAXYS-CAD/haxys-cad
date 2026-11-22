@@ -9,7 +9,7 @@
 // Projetos e saídas ficam em Documentos\HAXYS CAD (variável HAXYS_DADOS).
 const { app, BrowserWindow, dialog, shell } = require("electron");
 const { spawn } = require("node:child_process");
-const { existsSync, mkdirSync, unlinkSync } = require("node:fs");
+const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("node:fs");
 const { dirname, join } = require("node:path");
 const { pathToFileURL } = require("node:url");
 
@@ -61,13 +61,27 @@ function edgeAberto() {
 }
 
 // Escolheu "ligar a IA" no instalador: a primeira abertura começa pelo assistente.
+// IA já escolhida (ia.json com "modo"): o passo a passo não aparece mais; trocar é pelo botão "Ligar IA".
+function iaEscolhida() {
+  try {
+    return !!JSON.parse(readFileSync(join(process.env.HAXYS_DADOS, "ia.json"), "utf8")).modo;
+  } catch {
+    return false;
+  }
+}
+
+// Passo a passo da IA só uma vez. Em Program Files o programa não consegue apagar a marca do
+// instalador (sem administrador), então "já mostrei" fica na pasta do usuário.
 function primeiraPagina() {
   const marca = join(dirname(process.execPath), "ligar-ia.flag");
-  if (!app.isPackaged || !existsSync(marca)) return ENDERECO;
+  const visto = join(app.getPath("userData"), "ligar-ia-visto");
+  if (!app.isPackaged || !existsSync(marca) || existsSync(visto) || iaEscolhida()) return ENDERECO;
   try {
+    mkdirSync(dirname(visto), { recursive: true });
+    writeFileSync(visto, "");
     unlinkSync(marca);
   } catch {
-    /* fica para a próxima */
+    /* a marca fica, mas "visto" já impede de mostrar de novo */
   }
   return `${ENDERECO}ligar-ia.html`;
 }
